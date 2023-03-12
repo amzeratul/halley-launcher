@@ -20,6 +20,7 @@ set (SOURCES
 	"src/launcher.cpp"
 	"src/launcher_save_data.cpp"
 	"src/launcher_stage.cpp"
+	"src/project_properties.cpp"
 	"src/settings.cpp"
 	)
 
@@ -31,6 +32,7 @@ set (HEADERS
 	"src/launcher.h"
 	"src/launcher_save_data.h"
 	"src/launcher_stage.h"
+	"src/project_properties.h"
 	"src/settings.h"
 	)
 

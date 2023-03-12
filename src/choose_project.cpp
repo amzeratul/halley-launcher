@@ -80,7 +80,7 @@ void ChooseProject::loadPaths()
 {
 	Vector<String> toRemove;
 	for (const auto& path: settings.getProjects()) {
-		if (auto properties = getProjectProperties(Path(path))) {
+		if (auto properties = ProjectProperties::getProjectProperties(Path(path), &factory.getResources(), &videoAPI)) {
 			addPathToList(*properties);
 		} else {
 			toRemove.push_back(path);
@@ -93,7 +93,7 @@ void ChooseProject::loadPaths()
 
 void ChooseProject::addNewPath(const Path& path)
 {
-	if (const auto properties = getProjectProperties(path)) {
+	if (const auto properties = ProjectProperties::getProjectProperties(path, &factory.getResources(), &videoAPI)) {
 		const bool added = settings.addProject(path.toString());
 		if (added) {
 			addPathToList(*properties);
@@ -125,28 +125,4 @@ void ChooseProject::addPathToList(const ProjectProperties& properties)
 	});
 
 	list->addItem(id, std::move(entry), 1);
-}
-
-std::optional<ChooseProject::ProjectProperties> ChooseProject::getProjectProperties(const Path& path) const
-{
-	const auto bytes = Path::readFile(path / "halley_project" / "properties.yaml");
-	if (bytes.empty()) {
-		return {};
-	}
-
-	ProjectProperties result;
-
-	const auto iconBytes = Path::readFile(path / "halley_project" / "icon48.png");
-	if (!iconBytes.empty()) {
-		auto image = std::make_unique<Image>(iconBytes.byte_span());
-		result.icon.setImage(factory.getResources(), videoAPI, std::move(image));
-	}
-
-	const auto config = YAMLConvert::parseConfig(bytes);
-	result.name = config.getRoot()["name"].asString("Unknown");
-	result.path = path;
-
-	// TODO: fill Halley Version
-
-	return result;
 }

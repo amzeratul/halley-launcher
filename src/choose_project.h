@@ -1,6 +1,7 @@
 #pragma once
 
 #include <halley.hpp>
+#include "project_properties.h"
 
 class Settings;
 
@@ -14,15 +15,6 @@ namespace Halley {
         void onMakeUI() override;
     	
     private:
-        struct ProjectProperties {
-            Path path;
-            String name;
-            Sprite icon;
-            int halleyVerMajor = 0;
-            int halleyVerMinor = 0;
-            int halleyVerRevision = 0;
-        };
-
     	UIFactory& factory;
         VideoAPI& videoAPI;
         Settings& settings;
@@ -35,7 +27,5 @@ namespace Halley {
     	void loadPaths();
     	void addNewPath(const Path& path);
         void addPathToList(const ProjectProperties& properties);
-
-        std::optional<ProjectProperties> getProjectProperties(const Path& path) const;
     };
 }
