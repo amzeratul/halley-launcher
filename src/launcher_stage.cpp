@@ -35,9 +35,6 @@ void LauncherStage::onRender(RenderContext& context) const
 		// Background
 		background.clone().setTexRect(view).setSize(view.getSize()).draw(painter);
 
-		// Logo
-		halleyLogo.clone().setPosition(view.getTopCenter() + Vector2f(0, 40)).draw(painter);
-		
 		// UI
 		SpritePainter spritePainter;
 		spritePainter.start();
@@ -54,17 +51,6 @@ void LauncherStage::makeSprites()
 		.set("u_col1", Colour4f(0.07f))
 		.set("u_distance", 6.0f);
 	background = uiFactory->getColourScheme()->getBackground();
-
-	const auto col = uiFactory->getColourScheme()->getColour("logo");
-	halleyLogo = Sprite()
-		.setImage(getResources(), "halley/halley_logo_dist.png", "Halley/DistanceFieldSprite")
-		.setPivot(Vector2f(0.5f, 0.5f))
-		.setScale(Vector2f(0.8f, 0.8f))
-		.setColour(col);
-	halleyLogo.getMutableMaterial()
-		.set("u_smoothness", 16.0f)
-		.set("u_outline", 0.0f)
-		.set("u_outlineColour", col);
 }
 
 void LauncherStage::makeUI()
@@ -87,7 +73,7 @@ void LauncherStage::updateUI(Time time)
 {
 	const auto kb = getInputAPI().getKeyboard();
 	const auto size = getVideoAPI().getWindow().getDefinition().getSize();
-	const auto uiRect = Rect4f(Vector2f(), Vector2f(size)).grow(0, -60, 0, 0);
+	const auto uiRect = Rect4f(Vector2f(), Vector2f(size)).grow(0, 0, 0, 0);
 
 	topLevelUI->setMinSize(uiRect.getSize());
 	topLevelUI->setPosition(uiRect.getTopLeft());

@@ -14,6 +14,10 @@ namespace Halley {
 
     	Vector<Path> paths;
 
+        void onNew();
+        void onAdd();
+        void onOpen();
+
     	void loadPaths();
     	void savePaths();
     	void addNewPath(Path path);

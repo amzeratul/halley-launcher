@@ -1,22 +1,83 @@
----
-
-widget: { class: widget }
-sizer: { type: vertical }
+uuid: e3d2c07e-b6b7-4908-8fe0-1d41e384b1c4
+sizer:
+  columnProportions: []
+  columns: 1
+  gap: 5
+  type: vertical
+widget:
+  class: widget
 children:
-- widget: { id: title, class: label, text: "Load Project" }
-  fill: centre
-- sizer: { type: horizontal }
-  children:
-  - stretchSpacer: {}
+  - uuid: 04e39d1b-997b-4079-8eec-dec8718874bc
+    border: [0, -30, 0, 0]
+    sizer:
+      columnProportions: []
+    widget:
+      class: image
+      id: logo
+    fill: [centreHorizontal, fillVertical]
+  - uuid: 86a70804-e030-44f8-b81f-4b1380ade7f6
+    sizer:
+      columnProportions: []
+      gap: 4
+      type: horizontal
+    children:
+      - uuid: ddb91721-361c-4ddc-a9ac-be3c22da2218
+        sizer:
+          columnProportions: []
+        widget:
+          active: false
+          class: button
+          id: updateLauncher
+          size: [150, 0]
+          text: Update Launcher
+      - uuid: 2bdc6567-0672-499f-b462-725f6d7042fd
+        proportion: 1
+        stretchSpacer: {}
+      - uuid: 2593b651-3b48-4b5f-879b-6b4262cae612
+        sizer:
+          columnProportions: []
+        widget:
+          class: button
+          id: new
+          size: [120, 0]
+          text: New Project
+          tooltip: Creates a new project from scratch
+      - uuid: 2a5afd90-6563-4d80-9ec2-4b6b03a2a0fb
+        sizer:
+          columnProportions: []
+        widget:
+          class: button
+          id: add
+          size: [120, 22]
+          text: Add Project
+          tooltip: Opens an existing Halley Project
+  - uuid: 63249efb-5f37-4b64-a7fb-793bbc4ffc3d
     proportion: 1
-  - widget: { id: new, class: button, text: "New...", size: [100, 22], tooltip: "Create a new Halley Project" }
-  - widget: { id: open, class: button, text: "Open...", size: [100, 22], tooltip: "Opens an existing Halley Project" }
-- widget: { class: scrollBarPane, size: [200, 200] }
-  proportion: 1
-  border: [0, 5, 0, 0]
-  sizer: { type: vertical }
-  children:
-  - widget: { id: recent, class: list }
-    proportion: 1
-
-...
+    border: [0, 0, 0, 0]
+    sizer:
+      columnProportions: []
+      type: vertical
+    widget:
+      class: scrollBarPane
+      size: [500, 200]
+    children:
+      - uuid: a6c08b7f-af77-461c-8af0-ffe1838cf4eb
+        proportion: 1
+        widget:
+          class: list
+          id: recent
+  - uuid: 14f589ef-f890-4fe3-a5da-88871778c594
+    sizer:
+      columnProportions: []
+    children:
+      - uuid: 29e44461-b198-45e3-9070-e98eea1ea88c
+        proportion: 1
+        spacer: {}
+      - uuid: b77d7824-eef0-4bcd-bd65-c15a59e4df01
+        sizer:
+          columnProportions: []
+        widget:
+          class: button
+          id: open
+          size: [120, 0]
+          text: Open

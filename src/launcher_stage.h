@@ -24,7 +24,6 @@ namespace Halley {
 		Executor mainThreadExecutor;
 
 		Sprite background;
-		Sprite halleyLogo;
 		std::shared_ptr<LauncherSaveData> saveData;
 
 		void makeSprites();
