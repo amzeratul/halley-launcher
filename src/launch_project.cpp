@@ -69,17 +69,19 @@ void LaunchProject::buildProject()
 
 void LaunchProject::launchProject()
 {
-	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
+	if (hasUI) {
+		getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
+	}
 
 	const auto dir = path / "halley" / "bin";
 	const auto cmd = dir / "halley-editor.exe";
 
-	if (Path::exists(cmd)) {
-		runningCommand = OS::get().runCommandAsync(cmd.getNativeString(), dir.getNativeString(false), this);
+	if (Path::exists(cmd) && OS::get().runCommandDetached(cmd.getNativeString() + " " + path.getNativeString(false), dir.getNativeString(false))) {
 		parent.getHalleyAPI().core->quit(0);
 	} else {
 		if (!hasUI) {
 			factory.loadUI(*this, "launcher/launch_project");
+			getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
 		}
 		log(LoggerLevel::Error, "Editor not found at " + cmd.getNativeString());
 	}

@@ -43,7 +43,7 @@ std::optional<ProjectProperties> ProjectProperties::getProjectProperties(const P
 		}
 	}
 
-	result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "built_version.txt"));
+	result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "build_version.txt"));
 
 	return result;
 }

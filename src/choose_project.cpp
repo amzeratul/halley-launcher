@@ -44,12 +44,16 @@ void ChooseProject::onMakeUI()
 	
 	setHandle(UIEventType::ButtonClicked, "open", [=] (const UIEvent& event)
 	{
-		onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId());
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId());
+		});
 	});
 
 	setHandle(UIEventType::ListAccept, "projects", [=] (const UIEvent& event)
 	{
-		onOpen(event.getStringData());
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			onOpen(event.getStringData());
+		});
 	});
 }
 
