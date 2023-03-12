@@ -1,0 +1,7 @@
+assetPackManifest: halley_project/asset_manifest.yaml
+binName: halley-launcher
+defaultZoom: 1
+importByExtension: false
+name: Halley-Launcher
+platforms: [pc]
+uuid: 174228fd-049f-4e02-a9b7-fa69b749a753

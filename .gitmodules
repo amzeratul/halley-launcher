@@ -1,0 +1,3 @@
+[submodule "halley"]
+	path = halley
+	url = git@github.com:amzeratul/halley.git

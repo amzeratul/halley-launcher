@@ -1,0 +1,39 @@
+---
+packs:
+  - name: music
+    matches:
+      - ~:audioClip:music
+
+  - name: sfx
+    matches:
+      - ~:audioClip:sfx
+
+  - name: movie
+    matches:
+      - ~:binaryFile:movie
+
+  - name: config
+    matches:
+      - ~:configFile
+      - ~:textFile
+      - ~:audioEvent
+      - ~:variableTable
+      - ~:binaryFile:lua
+      - ~:uiDefinition
+      - ~:gameProperties
+      - ~:prefab
+      - ~:scene
+
+  - name: images
+    matches:
+      - ~:font
+      - ~:sprite
+      - ~:spriteSheet
+      - ~:animation
+      - ~:texture
+
+  - name: shaders
+    matches:
+      - ~:materialDefinition
+      - ~:shader
+...
