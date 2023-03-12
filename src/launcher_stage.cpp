@@ -64,6 +64,11 @@ void LauncherStage::switchTo(const String& view)
 	}
 }
 
+const HalleyAPI& LauncherStage::getHalleyAPI() const
+{
+	return getAPI();
+}
+
 void LauncherStage::makeSprites()
 {
 	auto mat = std::make_shared<Material>(getResource<MaterialDefinition>("Launcher/Background"));

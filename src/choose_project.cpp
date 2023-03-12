@@ -112,7 +112,7 @@ void ChooseProject::addPathToList(const ProjectProperties& properties)
 	auto entry = factory.makeUI("launcher/project_entry");
 	entry->getWidgetAs<UILabel>("project_name")->setText(LocalisedString::fromUserString(properties.name));
 	entry->getWidgetAs<UILabel>("project_path")->setText(LocalisedString::fromUserString(properties.path.getNativeString(false)));
-	entry->getWidgetAs<UILabel>("halley_version")->setText(LocalisedString::fromUserString("Halley version " + toString(properties.halleyVerMajor) + "." + toString(properties.halleyVerMinor) + "." + toString(properties.halleyVerRevision)));
+	entry->getWidgetAs<UILabel>("halley_version")->setText(LocalisedString::fromUserString("Halley v" + properties.halleyVersion.toString()));
 
 	if (properties.icon.hasMaterial()) {
 		entry->getWidgetAs<UIImage>("project_icon")->setSprite(properties.icon);

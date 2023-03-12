@@ -10,6 +10,7 @@ namespace Halley {
 		virtual ~ILauncher() = default;
 		virtual void switchTo(std::shared_ptr<UIWidget> widget) = 0;
 		virtual void switchTo(const String& view) = 0;
+		virtual const HalleyAPI& getHalleyAPI() const = 0;
 	};
 
 	class LauncherStage : public Stage, public ILauncher {
@@ -23,6 +24,7 @@ namespace Halley {
 
 		void switchTo(std::shared_ptr<UIWidget> widget) override;
 		void switchTo(const String& view) override;
+		const HalleyAPI& getHalleyAPI() const override;
 
 	private:
 		I18N i18n;

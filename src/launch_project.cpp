@@ -1,15 +1,101 @@
 #include "launch_project.h"
+
+#include "launcher_stage.h"
+#include "project_properties.h"
 using namespace Halley;
 
 LaunchProject::LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path)
-	: factory(factory)
+	: UIWidget("launch_project", Vector2f(), UISizer())
+	, factory(factory)
 	, settings(settings)
 	, parent(parent)
 	, path(std::move(path))
 {
+	const auto properties = ProjectProperties::getProjectProperties(this->path);
+	if (!properties) {
+		parent.switchTo("choose_project");
+	} else if (properties->builtVersion != properties->halleyVersion) {
+		factory.loadUI(*this, "launcher/launch_project");
+		buildProject();
+	} else {
+		launchProject();
+	}
 }
 
 void LaunchProject::onMakeUI()
 {
-	
+	hasUI = true;
+
+	setHandle(UIEventType::ButtonClicked, "cancel", [=] (const UIEvent& event)
+	{
+		if (runningCommand.isValid()) {
+			runningCommand.cancel();
+			runningCommand = {};
+		}
+		parent.switchTo("choose_project");
+	});
+}
+
+void LaunchProject::buildProject()
+{
+	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Building..."));
+
+	const String scriptName = [] ()
+	{
+		if constexpr (getPlatform() == GamePlatform::Windows) {
+			return "build_target_editor.bat";
+		} else {
+			throw Exception("No project build script available for this platform.", HalleyExceptions::Tools);
+		}
+	}();
+	const auto& api = parent.getHalleyAPI();
+	const auto rootPath = api.core->getEnvironment().getProgramPath() / "..";
+	const auto buildScript = rootPath / "scripts" / scriptName;
+	const auto command = "\"" + buildScript.getNativeString() + "\" \"";
+
+	runningCommand = OS::get().runCommandAsync(command, path.getNativeString(false), this);
+	runningCommand.then(Executors::getMainUpdateThread(), [=] (int returnValue)
+	{
+		if (returnValue == 0) {
+			// Success
+			log(LoggerLevel::Info, "Build successful.");
+			launchProject();
+		} else {
+			// Fail
+			log(LoggerLevel::Error, "Build failed with error code " + toString(returnValue));
+		}
+	});
+}
+
+void LaunchProject::launchProject()
+{
+	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
+
+	const auto dir = path / "halley" / "bin";
+	const auto cmd = dir / "halley-editor.exe";
+
+	if (Path::exists(cmd)) {
+		runningCommand = OS::get().runCommandAsync(cmd.getNativeString(), dir.getNativeString(false), this);
+		parent.getHalleyAPI().core->quit(0);
+	} else {
+		if (!hasUI) {
+			factory.loadUI(*this, "launcher/launch_project");
+		}
+		log(LoggerLevel::Error, "Editor not found at " + cmd.getNativeString());
+	}
+}
+
+void LaunchProject::log(LoggerLevel level, std::string_view msg)
+{
+	const char* styleNames[] = { "ui_logDevText", "ui_logInfoText", "ui_logWarningText", "ui_logErrorText" };
+
+	auto label = std::make_shared<UILabel>("", factory.getStyle("labelLight"), LocalisedString::fromUserString(msg));
+	label->setColour(factory.getColourScheme()->getColour(styleNames[static_cast<int>(level)]));
+
+	const auto logList = getWidget("log");
+	logList->add(label);
+	logList->layout();
+	logList->sendEvent(UIEvent(UIEventType::MakeAreaVisible, logList->getId(), label->getRect() - logList->getPosition()));
+
+	Logger::log(level, msg);
 }

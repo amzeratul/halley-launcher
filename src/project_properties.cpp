@@ -33,15 +33,17 @@ std::optional<ProjectProperties> ProjectProperties::getProjectProperties(const P
 					}
 				}
 				if (line.contains("HALLEY_VERSION_MAJOR")) {
-					result.halleyVerMajor = value;
+					result.halleyVersion.major = value;
 				} else if (line.contains("HALLEY_VERSION_MINOR")) {
-					result.halleyVerMinor = value;
+					result.halleyVersion.minor = value;
 				} else if (line.contains("HALLEY_VERSION_REVISION")) {
-					result.halleyVerRevision = value;
+					result.halleyVersion.revision = value;
 				}
 			}
 		}
 	}
+
+	result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "built_version.txt"));
 
 	return result;
 }

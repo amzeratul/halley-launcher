@@ -1,0 +1,4 @@
+uiStyle:
+  labelLight:
+    classes: [label]
+    label: { font: Ubuntu Light, size: 14, colour: $ui_text }
