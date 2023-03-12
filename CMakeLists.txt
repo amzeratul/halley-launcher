@@ -19,6 +19,7 @@ set (SOURCES
 	"src/launcher.cpp"
 	"src/launcher_save_data.cpp"
 	"src/launcher_stage.cpp"
+	"src/settings.cpp"
 	)
 
 set (HEADERS
@@ -28,6 +29,7 @@ set (HEADERS
 	"src/launcher.h"
 	"src/launcher_save_data.h"
 	"src/launcher_stage.h"
+	"src/settings.h"
 	)
 
 if (MSVC)

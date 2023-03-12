@@ -1,0 +1,61 @@
+uuid: 8edee39e-4824-43d0-b03a-8a72baf8cd3c
+proportion: 0
+border: [0, 0, 0, 0]
+sizer:
+  columnProportions: []
+  gap: 4
+  type: horizontal
+widget:
+  class: widget
+children:
+  - uuid: 3bd86cec-37f8-4bc1-8ab4-ca3fa4133db3
+    border: [0, 0, 5, 4]
+    sizer:
+      columnProportions: []
+    widget:
+      class: image
+      id: project_icon
+      size: [48, 48]
+    fill: [centreHorizontal, centreVertical]
+  - uuid: e0fc5c26-6624-43ba-acb3-7b0f55f1064e
+    proportion: 1
+    border: [0, 0, 0, 0]
+    sizer:
+      columnProportions: []
+      type: vertical
+    children:
+      - uuid: 4a0558a9-4aac-410d-aaee-4d86c70a857f
+        sizer:
+          columnProportions: []
+        children:
+          - uuid: 7cdf573b-7839-438a-84d0-018daf387bec
+            proportion: 1
+            widget:
+              class: label
+              fontSize: 26
+              id: project_name
+              text: Project Name
+            fill: [left, fillVertical]
+          - uuid: 55b30163-c8c3-425f-aee2-0a76c7b037fa
+            border: [30, 0, 0, 4]
+            widget:
+              class: label
+              id: halley_version
+              text: Halley v1.x.y
+            fill: [centreHorizontal, bottom]
+          - uuid: f9827745-b88a-45ff-b853-6dd7763d1228
+            border: [10, 0, 0, 0]
+            sizer:
+              columnProportions: []
+            widget:
+              class: button
+              id: delete
+              style: buttonThin
+              text: x
+            fill: [right, top]
+      - uuid: 3505af2b-231d-4135-a4dd-d429ad2ff6e9
+        border: [0, 0, 0, 5]
+        widget:
+          class: label
+          id: project_path
+          text: x:\path\to\proj

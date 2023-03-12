@@ -2,6 +2,8 @@
 
 #include <halley.hpp>
 
+#include "settings.h"
+
 namespace Halley
 {
 	class HalleyLauncher final : public Game
@@ -10,7 +12,11 @@ namespace Halley
 		HalleyLauncher();
 		~HalleyLauncher();
 
+		Settings& getSettings();
+
 	protected:
+		std::unique_ptr<Settings> settings;
+
 		void init(const Environment& environment, const Vector<String>& args) override;
 		int initPlugins(IPluginRegistry &registry) override;
 		ResourceOptions initResourceLocator(const Path& gamePath, const Path& assetsPath, const Path& unpackedAssetsPath, ResourceLocator& locator) override;
@@ -20,5 +26,7 @@ namespace Halley
 		String getDataPath() const override;
 		bool isDevMode() const override;
 		bool shouldCreateSeparateConsole() const override;
+
+		String getDefaultColourScheme() override;
 	};
 }

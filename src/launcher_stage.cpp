@@ -1,6 +1,7 @@
 #include "launcher_stage.h"
 
 #include "choose_project.h"
+#include "launcher.h"
 #include "launcher_save_data.h"
 using namespace Halley;
 
@@ -19,6 +20,11 @@ void LauncherStage::init()
 
 void LauncherStage::onVariableUpdate(Time time)
 {
+	auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+	if (settings.isDirty()) {
+		settings.saveToFile(getSystemAPI());
+	}
+
 	mainThreadExecutor.runPending();
 	updateUI(time);
 }
@@ -63,7 +69,8 @@ void LauncherStage::makeUI()
 	topLevelUI = uiFactory->makeUI("launcher/background");
 	ui->addChild(topLevelUI);
 
-	setCurrentUI(std::make_shared<ChooseProject>(*uiFactory));
+	auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+	setCurrentUI(std::make_shared<ChooseProject>(*uiFactory, getVideoAPI(), settings));
 
 	const auto bgCol = uiFactory->getColourScheme()->getColour("background0");
 	getVideoAPI().getWindow().setTitleColour(bgCol, bgCol);

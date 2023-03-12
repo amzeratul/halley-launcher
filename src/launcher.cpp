@@ -1,6 +1,7 @@
 #include "launcher.h"
 
 #include "launcher_stage.h"
+#include "settings.h"
 
 using namespace Halley;
 
@@ -17,6 +18,11 @@ HalleyLauncher::HalleyLauncher()
 
 HalleyLauncher::~HalleyLauncher()
 {}
+
+Settings& HalleyLauncher::getSettings()
+{
+	return *settings;
+}
 
 void HalleyLauncher::init(const Environment& environment, const Vector<String>& args)
 {}
@@ -48,8 +54,10 @@ ResourceOptions HalleyLauncher::initResourceLocator(const Path& gamePath, const 
 std::unique_ptr<Stage> HalleyLauncher::startGame()
 {
 	auto& api = getAPI();
+	settings = std::make_unique<Settings>();
+	settings->loadFromFile(*api.system);
 
-	api.video->setWindow(WindowDefinition(WindowType::Window, Vector2i(1000, 500), "Halley Launcher"));
+	api.video->setWindow(WindowDefinition(WindowType::Window, Vector2i(800, 500), "Halley Launcher"));
 	api.video->setVsync(true);
 
 	return std::make_unique<LauncherStage>();
@@ -72,7 +80,12 @@ bool HalleyLauncher::isDevMode() const
 
 bool HalleyLauncher::shouldCreateSeparateConsole() const
 {
-	return true;
+	return Debug::isDebug();
+}
+
+String HalleyLauncher::getDefaultColourScheme()
+{
+	return "colour_schemes/flat_cobalt_dark";
 }
 
 HalleyGame(HalleyLauncher);

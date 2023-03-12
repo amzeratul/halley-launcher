@@ -2,16 +2,17 @@ uuid: e3d2c07e-b6b7-4908-8fe0-1d41e384b1c4
 sizer:
   columnProportions: []
   columns: 1
-  gap: 5
+  gap: 10
   type: vertical
 widget:
   class: widget
 children:
   - uuid: 04e39d1b-997b-4079-8eec-dec8718874bc
-    border: [0, -30, 0, 0]
+    border: [0, -40, 0, -30]
     sizer:
       columnProportions: []
     widget:
+      active: false
       class: image
       id: logo
     fill: [centreHorizontal, fillVertical]
@@ -38,6 +39,7 @@ children:
           columnProportions: []
         widget:
           class: button
+          enabled: false
           id: new
           size: [120, 0]
           text: New Project
@@ -63,9 +65,13 @@ children:
     children:
       - uuid: a6c08b7f-af77-461c-8af0-ffe1838cf4eb
         proportion: 1
+        sizer:
+          columnProportions: []
+          gap: 2
         widget:
           class: list
-          id: recent
+          id: projects
+          options: []
   - uuid: 14f589ef-f890-4fe3-a5da-88871778c594
     sizer:
       columnProportions: []

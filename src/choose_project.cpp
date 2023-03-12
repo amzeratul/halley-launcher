@@ -1,9 +1,13 @@
 #include "choose_project.h"
+
+#include "settings.h"
 using namespace Halley;
 
-ChooseProject::ChooseProject(UIFactory& factory)
+ChooseProject::ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings)
 	: UIWidget("choose_project", {}, UISizer())
 	, factory(factory)
+	, videoAPI(videoAPI)
+	, settings(settings)
 {
 	factory.loadUI(*this, "launcher/load_project");
 
@@ -21,7 +25,9 @@ void ChooseProject::onMakeUI()
 		.set("u_smoothness", 16.0f)
 		.set("u_outline", 0.0f)
 		.set("u_outlineColour", col);
-	getWidgetAs<UIImage>("logo")->setSprite(std::move(halleyLogo));
+	auto logo = getWidgetAs<UIImage>("logo");
+	logo->setActive(true);
+	logo->setSprite(std::move(halleyLogo));
 	
 	setHandle(UIEventType::ButtonClicked, "new", [=] (const UIEvent& event)
 	{
@@ -63,27 +69,75 @@ void ChooseProject::onOpen()
 
 void ChooseProject::loadPaths()
 {
-	refresh();
+	Vector<String> toRemove;
+	for (const auto& path: settings.getProjects()) {
+		if (auto properties = getProjectProperties(Path(path))) {
+			addPathToList(*properties);
+		} else {
+			toRemove.push_back(path);
+		}
+	}
+	for (const auto& path: toRemove) {
+		settings.removeProject(path);
+	}
 }
 
-void ChooseProject::savePaths()
+void ChooseProject::addNewPath(const Path& path)
 {
-	
+	if (const auto properties = getProjectProperties(path)) {
+		const bool added = settings.addProject(path.toString());
+		if (added) {
+			addPathToList(*properties);
+		}
+	} else {
+		// TODO: report error
+	}
 }
 
-void ChooseProject::addNewPath(Path path)
+void ChooseProject::addPathToList(const ProjectProperties& properties)
 {
-	addPath(path);
-	savePaths();
-	refresh();
+	const auto list = getWidgetAs<UIList>("projects");
+
+	const auto id = properties.path.getString();
+
+	auto entry = factory.makeUI("launcher/project_entry");
+	entry->getWidgetAs<UILabel>("project_name")->setText(LocalisedString::fromUserString(properties.name));
+	entry->getWidgetAs<UILabel>("project_path")->setText(LocalisedString::fromUserString(properties.path.getNativeString(false)));
+	entry->getWidgetAs<UILabel>("halley_version")->setText(LocalisedString::fromUserString("Halley version " + toString(properties.halleyVerMajor) + "." + toString(properties.halleyVerMinor) + "." + toString(properties.halleyVerRevision)));
+
+	if (properties.icon.hasMaterial()) {
+		entry->getWidgetAs<UIImage>("project_icon")->setSprite(properties.icon);
+	}
+
+	entry->setHandle(UIEventType::ButtonClicked, "delete", [=] (const UIEvent& event)
+	{
+		settings.removeProject(id);
+		list->removeItem(id);
+	});
+
+	list->addItem(id, std::move(entry), 1);
 }
 
-void ChooseProject::addPath(Path path)
+std::optional<ChooseProject::ProjectProperties> ChooseProject::getProjectProperties(const Path& path) const
 {
-	paths.emplace_back(std::move(path));
-}
+	const auto bytes = Path::readFile(path / "halley_project" / "properties.yaml");
+	if (bytes.empty()) {
+		return {};
+	}
 
-void ChooseProject::refresh()
-{
-	
+	ProjectProperties result;
+
+	const auto iconBytes = Path::readFile(path / "halley_project" / "icon48.png");
+	if (!iconBytes.empty()) {
+		auto image = std::make_unique<Image>(iconBytes.byte_span());
+		result.icon.setImage(factory.getResources(), videoAPI, std::move(image));
+	}
+
+	const auto config = YAMLConvert::parseConfig(bytes);
+	result.name = config.getRoot()["name"].asString("Unknown");
+	result.path = path;
+
+	// TODO: fill Halley Version
+
+	return result;
 }
