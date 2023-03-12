@@ -17,6 +17,7 @@ public:
 	void setProjects(Vector<String> projects);
 	bool addProject(String path);
 	bool removeProject(const String& path);
+	void bumpProject(const String& path);
 
 private:
 	mutable bool dirty = false;

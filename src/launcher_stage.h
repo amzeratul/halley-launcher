@@ -5,7 +5,14 @@
 #include "launcher_save_data.h"
 
 namespace Halley {
-	class LauncherStage : public Stage {
+	class ILauncher {
+	public:
+		virtual ~ILauncher() = default;
+		virtual void switchTo(std::shared_ptr<UIWidget> widget) = 0;
+		virtual void switchTo(const String& view) = 0;
+	};
+
+	class LauncherStage : public Stage, public ILauncher {
 	public:
 		LauncherStage();
 		
@@ -13,6 +20,9 @@ namespace Halley {
 
 		void onVariableUpdate(Time) override;
 		void onRender(RenderContext&) const override;
+
+		void switchTo(std::shared_ptr<UIWidget> widget) override;
+		void switchTo(const String& view) override;
 
 	private:
 		I18N i18n;

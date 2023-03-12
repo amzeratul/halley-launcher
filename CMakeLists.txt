@@ -16,6 +16,7 @@ set (SOURCES
 	"prec.cpp"
 
 	"src/choose_project.cpp"
+	"src/launch_project.cpp"
 	"src/launcher.cpp"
 	"src/launcher_save_data.cpp"
 	"src/launcher_stage.cpp"
@@ -26,6 +27,7 @@ set (HEADERS
 	"prec.h"
 
 	"src/choose_project.h"
+	"src/launch_project.h"
 	"src/launcher.h"
 	"src/launcher_save_data.h"
 	"src/launcher_stage.h"

@@ -5,9 +5,11 @@
 class Settings;
 
 namespace Halley {
-    class ChooseProject : public UIWidget {
+	class ILauncher;
+
+	class ChooseProject : public UIWidget {
     public:
-    	ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings);
+    	ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings, ILauncher& parent);
 
         void onMakeUI() override;
     	
@@ -24,10 +26,11 @@ namespace Halley {
     	UIFactory& factory;
         VideoAPI& videoAPI;
         Settings& settings;
+        ILauncher& parent;
         
         void onNew();
         void onAdd();
-        void onOpen();
+        void onOpen(const Path& path);
 
     	void loadPaths();
     	void addNewPath(const Path& path);

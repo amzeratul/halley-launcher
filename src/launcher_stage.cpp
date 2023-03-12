@@ -49,6 +49,21 @@ void LauncherStage::onRender(RenderContext& context) const
 	});
 }
 
+void LauncherStage::switchTo(std::shared_ptr<UIWidget> widget)
+{
+	setCurrentUI(widget);
+}
+
+void LauncherStage::switchTo(const String& view)
+{
+	if (view == "choose_project") {
+		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+		setCurrentUI(std::make_shared<ChooseProject>(*uiFactory, getVideoAPI(), settings, *this));
+	} else {
+		setCurrentUI({});
+	}
+}
+
 void LauncherStage::makeSprites()
 {
 	auto mat = std::make_shared<Material>(getResource<MaterialDefinition>("Launcher/Background"));
@@ -69,11 +84,10 @@ void LauncherStage::makeUI()
 	topLevelUI = uiFactory->makeUI("launcher/background");
 	ui->addChild(topLevelUI);
 
-	auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
-	setCurrentUI(std::make_shared<ChooseProject>(*uiFactory, getVideoAPI(), settings));
-
 	const auto bgCol = uiFactory->getColourScheme()->getColour("background0");
 	getVideoAPI().getWindow().setTitleColour(bgCol, bgCol);
+
+	switchTo("choose_project");
 }
 
 void LauncherStage::updateUI(Time time)
@@ -95,6 +109,8 @@ void LauncherStage::setCurrentUI(std::shared_ptr<UIWidget> ui)
 	if (curUI) {
 		curUI->destroy();
 	}
-	container->add(ui, 1);
+	if (ui) {
+		container->add(ui, 1);
+	}
 	curUI = ui;
 }

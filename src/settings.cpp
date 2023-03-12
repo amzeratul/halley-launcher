@@ -51,7 +51,7 @@ void Settings::setProjects(Vector<String> projects)
 bool Settings::addProject(String path)
 {
 	if (!std_ex::contains(projects, path)) {
-		projects.push_back(path);
+		projects.insert(projects.begin(), path);
 		dirty = true;
 		return true;
 	}
@@ -66,4 +66,10 @@ bool Settings::removeProject(const String& path)
 		return true;
 	}
 	return false;
+}
+
+void Settings::bumpProject(const String& path)
+{
+	removeProject(path);
+	addProject(path);
 }

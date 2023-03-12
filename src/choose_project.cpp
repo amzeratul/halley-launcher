@@ -1,13 +1,16 @@
 #include "choose_project.h"
 
+#include "launcher_stage.h"
+#include "launch_project.h"
 #include "settings.h"
 using namespace Halley;
 
-ChooseProject::ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings)
+ChooseProject::ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings, ILauncher& parent)
 	: UIWidget("choose_project", {}, UISizer())
 	, factory(factory)
 	, videoAPI(videoAPI)
 	, settings(settings)
+	, parent(parent)
 {
 	factory.loadUI(*this, "launcher/load_project");
 
@@ -41,7 +44,12 @@ void ChooseProject::onMakeUI()
 	
 	setHandle(UIEventType::ButtonClicked, "open", [=] (const UIEvent& event)
 	{
-		onOpen();
+		onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId());
+	});
+
+	setHandle(UIEventType::ListAccept, "projects", [=] (const UIEvent& event)
+	{
+		onOpen(event.getStringData());
 	});
 }
 
@@ -62,9 +70,10 @@ void ChooseProject::onAdd()
 	});
 }
 
-void ChooseProject::onOpen()
+void ChooseProject::onOpen(const Path& path)
 {
-	// TODO
+	settings.bumpProject(path.getString());
+	parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, path));
 }
 
 void ChooseProject::loadPaths()

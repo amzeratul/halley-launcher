@@ -72,6 +72,7 @@ children:
           class: list
           id: projects
           options: []
+          singleClickAccept: false
   - uuid: 14f589ef-f890-4fe3-a5da-88871778c594
     sizer:
       columnProportions: []
