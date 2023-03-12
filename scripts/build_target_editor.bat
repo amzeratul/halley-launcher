@@ -1,12 +1,12 @@
 @echo off
 
-taskkill /IM halley-editor.exe /F
-taskkill /IM halley-cmd.exe /F
+taskkill /IM halley-editor.exe /F 2>NUL
+taskkill /IM halley-cmd.exe /F 2>NUL
 
 if not exist build mkdir build
 cd build
 
-mkdir "%~dp0..\halley\bin\"
+mkdir "%~dp0..\halley\bin\" 2>NUL
 xcopy "%~dp0..\halley\deps\bin\SDL2.dll" "%~dp0..\halley\bin\" /C /Q /Y
 xcopy "%~dp0..\halley_deps\bin\dxcompiler.dll" "%~dp0..\halley\bin\" /C /Q /Y
 xcopy "%~dp0..\halley_deps\bin\ShaderConductor.dll" "%~dp0..\halley\bin\" /C /Q /Y
