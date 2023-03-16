@@ -43,7 +43,9 @@ std::optional<ProjectProperties> ProjectProperties::getProjectProperties(const P
 		}
 	}
 
-	result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "build_version.txt"));
+	if (Path::exists(path / "halley" / "bin" / "halley-editor.exe")) {
+		result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "build_version.txt"));
+	}
 
 	return result;
 }
