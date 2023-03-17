@@ -12,7 +12,7 @@ namespace Halley {
     	LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path);
 
         void onMakeUI() override;
-
+        
 	protected:
         void log(LoggerLevel level, std::string_view msg) override;
 

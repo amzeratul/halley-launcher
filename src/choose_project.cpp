@@ -49,12 +49,23 @@ void ChooseProject::onMakeUI()
 		});
 	});
 
+	setHandle(UIEventType::ButtonClicked, "updateLauncher", [=] (const UIEvent& event)
+	{
+		onUpdateLauncher();
+	});
+
 	setHandle(UIEventType::ListAccept, "projects", [=] (const UIEvent& event)
 	{
 		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
 			onOpen(event.getStringData());
 		});
 	});
+}
+
+void ChooseProject::update(Time t, bool moved)
+{
+	const auto newVersionInfo = parent.getNewVersionInfo();
+	getWidget("updateLauncher")->setActive(newVersionInfo && newVersionInfo->isNewVersion());
 }
 
 void ChooseProject::onNew()
@@ -78,6 +89,11 @@ void ChooseProject::onOpen(const Path& path)
 {
 	settings.bumpProject(path.getString());
 	parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, path));
+}
+
+void ChooseProject::onUpdateLauncher()
+{
+	parent.switchTo("update");
 }
 
 void ChooseProject::loadPaths()

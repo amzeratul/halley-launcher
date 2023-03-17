@@ -3,6 +3,7 @@
 #include "choose_project.h"
 #include "launcher.h"
 #include "launcher_save_data.h"
+#include "update.h"
 using namespace Halley;
 
 LauncherStage::LauncherStage()
@@ -16,6 +17,17 @@ void LauncherStage::init()
 	
 	makeUI();
 	makeSprites();
+
+	newVersionCheck = getWebAPI().makeHTTPRequest(HTTPMethod::GET, "http://update.halley.io/halley-launcher.yaml")->send()
+		.then([] (std::unique_ptr<HTTPResponse> response) -> NewVersionInfo
+	{
+		if (response->getResponseCode() == 200) {
+			return NewVersionInfo::parse(response->getBody());
+		} else {
+			Logger::logError("Unable to retrieve new version info.");
+			return {};
+		}
+	});
 }
 
 void LauncherStage::onVariableUpdate(Time time)
@@ -26,6 +38,12 @@ void LauncherStage::onVariableUpdate(Time time)
 	}
 
 	mainThreadExecutor.runPending();
+
+	if (newVersionCheck.isValid() && newVersionCheck.hasValue()) {
+		newVersionInfo = newVersionCheck.get();
+		newVersionCheck = {};
+	}
+
 	updateUI(time);
 }
 
@@ -59,6 +77,8 @@ void LauncherStage::switchTo(const String& view)
 	if (view == "choose_project") {
 		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
 		setCurrentUI(std::make_shared<ChooseProject>(*uiFactory, getVideoAPI(), settings, *this));
+	} else if (view == "update") {
+		setCurrentUI(std::make_shared<Update>(*uiFactory, *this, *newVersionInfo));
 	} else {
 		setCurrentUI({});
 	}
@@ -67,6 +87,11 @@ void LauncherStage::switchTo(const String& view)
 const HalleyAPI& LauncherStage::getHalleyAPI() const
 {
 	return getAPI();
+}
+
+std::optional<NewVersionInfo> LauncherStage::getNewVersionInfo() const
+{
+	return newVersionInfo;
 }
 
 void LauncherStage::makeSprites()

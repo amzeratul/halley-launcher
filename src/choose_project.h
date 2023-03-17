@@ -13,6 +13,7 @@ namespace Halley {
     	ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings, ILauncher& parent);
 
         void onMakeUI() override;
+        void update(Time t, bool moved) override;
     	
     private:
     	UIFactory& factory;
@@ -23,6 +24,7 @@ namespace Halley {
         void onNew();
         void onAdd();
         void onOpen(const Path& path);
+        void onUpdateLauncher();
 
     	void loadPaths();
     	void addNewPath(const Path& path);

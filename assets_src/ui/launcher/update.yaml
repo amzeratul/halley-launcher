@@ -1,0 +1,57 @@
+uuid: f6ecc509-a47d-4107-99ca-d1583fe93da3
+sizer:
+  columnProportions: []
+  columns: 1
+  gap: 10
+  type: vertical
+widget:
+  class: widget
+children:
+  - uuid: bdd3b25b-c373-4e40-ba6f-feac9b3fc0b5
+    proportion: 1
+    sizer:
+      columnProportions: []
+      gap: 10
+      type: vertical
+    widget:
+      class: widget
+    children:
+      - uuid: b3ba4a92-5c56-4e47-8ed2-dcae52e2ccdb
+        widget:
+          class: label
+          id: status
+          text: Downloading...
+      - uuid: dab208cb-08c4-44f7-b9a2-76ab61e876c6
+        sizer:
+          columnProportions: []
+        widget:
+          class: image
+          colour: "#00000080"
+          id: progress_bg
+          image: halley_ui/ui_list_item.png
+          size: [400, 0]
+        children:
+          - uuid: 37a875bc-d32d-4fe8-975c-aff2d6a96973
+            sizer:
+              columnProportions: []
+            widget:
+              class: image
+              id: progress
+              image: halley_ui/ui_list_item.png
+    fill: [centreHorizontal, centreVertical]
+  - uuid: 0e23480c-ddb6-4290-bb0d-d44d38e6d7d1
+    sizer:
+      columnProportions: []
+    children:
+      - uuid: 056d803a-45b1-40da-98ea-a41d6087d154
+        proportion: 1
+        spacer: {}
+      - uuid: 28b2ffc8-f0ac-49d4-ac10-da55cf93b40a
+        sizer:
+          columnProportions: []
+        widget:
+          class: button
+          id: cancel
+          mouseBorder: [0, 0, 0, 0]
+          size: [120, 0]
+          text: Cancel

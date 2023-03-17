@@ -3,6 +3,7 @@
 #include <halley.hpp>
 
 #include "launcher_save_data.h"
+#include "new_version_info.h"
 
 namespace Halley {
 	class ILauncher {
@@ -11,6 +12,7 @@ namespace Halley {
 		virtual void switchTo(std::shared_ptr<UIWidget> widget) = 0;
 		virtual void switchTo(const String& view) = 0;
 		virtual const HalleyAPI& getHalleyAPI() const = 0;
+		virtual std::optional<NewVersionInfo> getNewVersionInfo() const = 0;
 	};
 
 	class LauncherStage : public Stage, public ILauncher {
@@ -26,6 +28,8 @@ namespace Halley {
 		void switchTo(const String& view) override;
 		const HalleyAPI& getHalleyAPI() const override;
 
+		std::optional<NewVersionInfo> getNewVersionInfo() const override;
+
 	private:
 		I18N i18n;
 		std::unique_ptr<UIFactory> uiFactory;
@@ -37,6 +41,9 @@ namespace Halley {
 
 		Sprite background;
 		std::shared_ptr<LauncherSaveData> saveData;
+
+		Future<NewVersionInfo> newVersionCheck;
+		std::optional<NewVersionInfo> newVersionInfo;
 
 		void makeSprites();
 		void makeUI();

@@ -12,6 +12,7 @@ void initSDLInputPlugin(IPluginRegistry &registry);
 void initAsioPlugin(IPluginRegistry &registry);
 void initDX11Plugin(IPluginRegistry &registry);
 void initMetalPlugin(IPluginRegistry &registry);
+void initHTTPLibPlugin(IPluginRegistry &registry);
 
 HalleyLauncher::HalleyLauncher()
 {}
@@ -33,6 +34,7 @@ int HalleyLauncher::initPlugins(IPluginRegistry& registry)
 	initAsioPlugin(registry);
 	initSDLAudioPlugin(registry);
 	initSDLInputPlugin(registry);
+	initHTTPLibPlugin(registry);
 
 #ifdef _WIN32
 	initDX11Plugin(registry);
@@ -42,7 +44,7 @@ int HalleyLauncher::initPlugins(IPluginRegistry& registry)
 	initOpenGLPlugin(registry);
 #endif
 	
-	return HalleyAPIFlags::Video | HalleyAPIFlags::Audio | HalleyAPIFlags::Input | HalleyAPIFlags::Network;
+	return HalleyAPIFlags::Video | HalleyAPIFlags::Audio | HalleyAPIFlags::Input | HalleyAPIFlags::Network | HalleyAPIFlags::Web;
 }
 
 ResourceOptions HalleyLauncher::initResourceLocator(const Path& gamePath, const Path& assetsPath, const Path& unpackedAssetsPath, ResourceLocator& locator)
@@ -80,7 +82,7 @@ bool HalleyLauncher::isDevMode() const
 
 bool HalleyLauncher::shouldCreateSeparateConsole() const
 {
-	return Debug::isDebug();
+	return true || Debug::isDebug();
 }
 
 String HalleyLauncher::getDefaultColourScheme()

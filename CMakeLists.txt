@@ -20,8 +20,10 @@ set (SOURCES
 	"src/launcher.cpp"
 	"src/launcher_save_data.cpp"
 	"src/launcher_stage.cpp"
+	"src/new_version_info.cpp"
 	"src/project_properties.cpp"
 	"src/settings.cpp"
+	"src/update.cpp"
 	)
 
 set (HEADERS
@@ -32,8 +34,10 @@ set (HEADERS
 	"src/launcher.h"
 	"src/launcher_save_data.h"
 	"src/launcher_stage.h"
+	"src/new_version_info.h"
 	"src/project_properties.h"
 	"src/settings.h"
+	"src/update.h"
 	)
 
 if (MSVC)
