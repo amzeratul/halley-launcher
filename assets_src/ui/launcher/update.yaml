@@ -20,7 +20,9 @@ children:
         widget:
           class: label
           id: status
+          maxWidth: 500
           text: Downloading...
+          wordWrapped: true
       - uuid: dab208cb-08c4-44f7-b9a2-76ab61e876c6
         sizer:
           columnProportions: []
@@ -29,7 +31,7 @@ children:
           colour: "#00000080"
           id: progress_bg
           image: halley_ui/ui_list_item.png
-          size: [400, 0]
+          size: [500, 0]
         children:
           - uuid: 37a875bc-d32d-4fe8-975c-aff2d6a96973
             sizer:

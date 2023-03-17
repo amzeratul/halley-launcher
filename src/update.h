@@ -12,6 +12,7 @@ namespace Halley {
 	class Update : public UIWidget {
     public:
     	Update(UIFactory& factory, ILauncher& parent, NewVersionInfo info);
+        ~Update() override;
 
         void onMakeUI() override;
         
@@ -19,5 +20,11 @@ namespace Halley {
     	UIFactory& factory;
         ILauncher& parent;
         NewVersionInfo info;
+        Future<std::unique_ptr<HTTPResponse>> downloadFuture;
+
+        void download();
+        void onDownloadComplete(const Bytes& bytes);
+        void onError(const String& error);
+        void showMessage(const String& msg);
     };
 }
