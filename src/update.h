@@ -21,9 +21,10 @@ namespace Halley {
         ILauncher& parent;
         NewVersionInfo info;
         Future<std::unique_ptr<HTTPResponse>> downloadFuture;
+        Future<void> extractFuture;
 
         void download();
-        void onDownloadComplete(const Bytes& bytes);
+        void onDownloadComplete(Bytes bytes);
         void onError(const String& error);
         void showMessage(const String& msg);
     };

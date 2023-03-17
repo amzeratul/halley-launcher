@@ -49,7 +49,15 @@ int HalleyLauncher::initPlugins(IPluginRegistry& registry)
 
 ResourceOptions HalleyLauncher::initResourceLocator(const Path& gamePath, const Path& assetsPath, const Path& unpackedAssetsPath, ResourceLocator& locator)
 {
-	locator.addFileSystem(unpackedAssetsPath);
+	constexpr bool localAssets = false;
+	if (localAssets) {
+		locator.addFileSystem(unpackedAssetsPath);
+	} else {
+		const String packs[] = { "images.dat", "shaders.dat", "config.dat" };
+		for (auto& pack: packs) {
+			locator.addPack(Path(assetsPath) / pack);
+		}
+	}
 	return {};
 }
 

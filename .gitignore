@@ -5,3 +5,4 @@ assets_unpacked
 gen
 build
 halley_deps
+halley-launcher

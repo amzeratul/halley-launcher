@@ -18,6 +18,9 @@ Update::~Update()
 	if (downloadFuture.isValid()) {
 		downloadFuture.cancel();
 	}
+	if (extractFuture.isValid()) {
+		extractFuture.cancel();
+	}
 }
 
 void Update::onMakeUI()
@@ -42,11 +45,20 @@ void Update::download()
 	});
 }
 
-void Update::onDownloadComplete(const Bytes& bytes)
+void Update::onDownloadComplete(Bytes bytes)
 {
 	showMessage("Extracting...");
-	// TODO: extract zip
-	// TODO: run self-update
+
+	extractFuture = Concurrent::execute([=, bytes = std::move(bytes)]()
+	{
+		ZipFile zip;
+		zip.open(bytes);
+
+		Logger::logInfo("File contains:");
+		for (const auto& p: zip.getFileNames()) {
+			Logger::logInfo("  " + p);
+		}
+	});
 }
 
 void Update::onError(const String& error)
