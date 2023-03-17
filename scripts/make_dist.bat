@@ -1,7 +1,11 @@
 cd ..
-rd /s /q halley-launcher
-mkdir halley-launcher
-mkdir halley-launcher\bin
-copy bin\halley-launcher.exe halley-launcher\bin\halley-launcher.exe /Y
-copy bin\SDL2.dll halley-launcher\bin\SDL2.dll /Y
-robocopy assets halley-launcher\assets /E
+rd /s /q dist
+mkdir dist
+mkdir dist\bin
+mkdir dist\scripts
+copy bin\halley-launcher.exe dist\bin\halley-launcher.exe /Y
+copy bin\SDL2.dll dist\bin\SDL2.dll /Y
+copy scripts\update.bat dist\scripts\update.bat
+robocopy assets dist\assets /E
+cd dist
+7z a -tzip halley-launcher.zip *

@@ -35,6 +35,8 @@ namespace Halley {
 
         void extract(Bytes bytes);
 
+        void runUpdate();
+
         void onError(const String& error);
         void showMessage(const String& msg);
 

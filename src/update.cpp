@@ -125,6 +125,16 @@ void Update::extract(Bytes bytes)
 		runningTotal += fileBytes.size();
 		updateExtractProgress(runningTotal, totalSize);
 	}
+
+	runUpdate();
+}
+
+void Update::runUpdate()
+{
+	const auto cwd = parent.getHalleyAPI().core->getEnvironment().getProgramPath() / ".." / "tmp" / "scripts";
+	const auto path = cwd / "update.bat";
+	OS::get().runCommandDetached(path.getNativeString(false), cwd.getNativeString(false));
+	parent.exit();
 }
 
 void Update::onError(const String& error)

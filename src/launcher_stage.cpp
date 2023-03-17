@@ -94,6 +94,11 @@ std::optional<NewVersionInfo> LauncherStage::getNewVersionInfo() const
 	return newVersionInfo;
 }
 
+void LauncherStage::exit()
+{
+	getCoreAPI().quit(0);
+}
+
 void LauncherStage::makeSprites()
 {
 	auto mat = std::make_shared<Material>(getResource<MaterialDefinition>("Launcher/Background"));

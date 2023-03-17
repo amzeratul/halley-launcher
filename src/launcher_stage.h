@@ -13,6 +13,7 @@ namespace Halley {
 		virtual void switchTo(const String& view) = 0;
 		virtual const HalleyAPI& getHalleyAPI() const = 0;
 		virtual std::optional<NewVersionInfo> getNewVersionInfo() const = 0;
+		virtual void exit() = 0;
 	};
 
 	class LauncherStage : public Stage, public ILauncher {
@@ -29,6 +30,7 @@ namespace Halley {
 		const HalleyAPI& getHalleyAPI() const override;
 
 		std::optional<NewVersionInfo> getNewVersionInfo() const override;
+		void exit() override;
 
 	private:
 		I18N i18n;
