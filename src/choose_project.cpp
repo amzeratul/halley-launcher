@@ -51,7 +51,9 @@ void ChooseProject::onMakeUI()
 
 	setHandle(UIEventType::ButtonClicked, "updateLauncher", [=] (const UIEvent& event)
 	{
-		onUpdateLauncher();
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			onUpdateLauncher();
+		});
 	});
 
 	setHandle(UIEventType::ListAccept, "projects", [=] (const UIEvent& event)

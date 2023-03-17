@@ -15,17 +15,33 @@ namespace Halley {
         ~Update() override;
 
         void onMakeUI() override;
-        
+        void onAddedToRoot(UIRoot& root) override;
+
+        void update(Time t, bool moved) override;
+
     private:
     	UIFactory& factory;
         ILauncher& parent;
         NewVersionInfo info;
-        Future<std::unique_ptr<HTTPResponse>> downloadFuture;
+
+        bool downloading = false;
+		Future<std::unique_ptr<HTTPResponse>> downloadFuture;
         Future<void> extractFuture;
+
+        std::optional<std::pair<uint64_t, uint64_t>> latestProgress;
 
         void download();
         void onDownloadComplete(Bytes bytes);
+
+        void extract(Bytes bytes);
+
         void onError(const String& error);
         void showMessage(const String& msg);
+
+        void updateDownloadProgress(uint64_t cur, uint64_t total);
+        void updateExtractProgress(uint64_t cur, uint64_t total);
+        void doUpdateProgress();
+
+        bool isValidSignature(const Bytes& bytes);
     };
 }
