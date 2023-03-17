@@ -43,14 +43,12 @@ void LaunchProject::buildProject()
 	const String scriptName = [] ()
 	{
 		if constexpr (getPlatform() == GamePlatform::Windows) {
-			return "build_target_editor.bat";
+			return "build_editor.bat";
 		} else {
 			throw Exception("No project build script available for this platform.", HalleyExceptions::Tools);
 		}
 	}();
-	const auto& api = parent.getHalleyAPI();
-	const auto rootPath = api.core->getEnvironment().getProgramPath() / "..";
-	const auto buildScript = rootPath / "scripts" / scriptName;
+	const auto buildScript = path / "halley" / "scripts" / scriptName;
 	const auto command = "\"" + buildScript.getNativeString() + "\" \"";
 
 	runningCommand = OS::get().runCommandAsync(command, path.getNativeString(false), this);

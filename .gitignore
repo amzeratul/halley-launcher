@@ -6,3 +6,4 @@ gen
 build
 halley_deps
 dist
+tmp

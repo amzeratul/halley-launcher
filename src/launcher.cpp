@@ -90,7 +90,7 @@ bool HalleyLauncher::isDevMode() const
 
 bool HalleyLauncher::shouldCreateSeparateConsole() const
 {
-	return true || Debug::isDebug();
+	return Debug::isDebug();
 }
 
 String HalleyLauncher::getDefaultColourScheme()
