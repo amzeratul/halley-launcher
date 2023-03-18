@@ -8,6 +8,8 @@ set(HALLEY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/halley)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${HALLEY_PATH}/cmake/")
 include(HalleyProject)
 
+set(USE_SSL 1)
+
 if(NOT (DEFINED HALLEY_GAME_BIN_DIR))
 	set(HALLEY_GAME_BIN_DIR "bin")
 endif()

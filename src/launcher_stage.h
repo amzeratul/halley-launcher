@@ -18,7 +18,7 @@ namespace Halley {
 
 	class LauncherStage : public Stage, public ILauncher {
 	public:
-		LauncherStage();
+		LauncherStage(std::optional<String> initialProject);
 		
 		void init() override;
 
@@ -33,6 +33,7 @@ namespace Halley {
 		void exit() override;
 
 	private:
+		std::optional<String> initialProject;
 		I18N i18n;
 		std::unique_ptr<UIFactory> uiFactory;
 		std::unique_ptr<UIRoot> ui;

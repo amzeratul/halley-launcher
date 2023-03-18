@@ -5,7 +5,7 @@ using namespace Halley;
 
 class NewVersionInfo {
 public:
-    constexpr static int currentVersion = 0;
+    constexpr static int currentVersion = 1;
     
     int version;
     String download;

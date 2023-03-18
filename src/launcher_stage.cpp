@@ -3,11 +3,13 @@
 #include "choose_project.h"
 #include "launcher.h"
 #include "launcher_save_data.h"
+#include "launch_project.h"
 #include "update.h"
 using namespace Halley;
 
-LauncherStage::LauncherStage()
-	: mainThreadExecutor(Executors::getMainUpdateThread())
+LauncherStage::LauncherStage(std::optional<String> initialProject)
+	: initialProject(std::move(initialProject))
+	, mainThreadExecutor(Executors::getMainUpdateThread())
 {
 }
 
@@ -122,7 +124,12 @@ void LauncherStage::makeUI()
 	const auto bgCol = uiFactory->getColourScheme()->getColour("background0");
 	getVideoAPI().getWindow().setTitleColour(bgCol, bgCol);
 
-	switchTo("choose_project");
+	if (initialProject) {
+		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+		switchTo(std::make_shared<LaunchProject>(*uiFactory, settings, *this, *initialProject));
+	} else {
+		switchTo("choose_project");
+	}
 }
 
 void LauncherStage::updateUI(Time time)

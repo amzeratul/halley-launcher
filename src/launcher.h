@@ -16,6 +16,7 @@ namespace Halley
 
 	protected:
 		std::unique_ptr<Settings> settings;
+		std::optional<String> projectPath;
 
 		void init(const Environment& environment, const Vector<String>& args) override;
 		int initPlugins(IPluginRegistry &registry) override;

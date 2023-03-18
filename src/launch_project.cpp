@@ -73,8 +73,9 @@ void LaunchProject::launchProject()
 
 	const auto dir = path / "halley" / "bin";
 	const auto cmd = dir / "halley-editor.exe";
+	const auto params = "--project \"" + path.getNativeString(false) + "\" --launcher \"" + (parent.getHalleyAPI().core->getEnvironment().getProgramPath() / "halley-launcher.exe").getNativeString() + "\"";
 
-	if (Path::exists(cmd) && OS::get().runCommandDetached(cmd.getNativeString() + " " + path.getNativeString(false), dir.getNativeString(false))) {
+	if (Path::exists(cmd) && OS::get().runCommandDetached(cmd.getNativeString() + " " + params, dir.getNativeString(false))) {
 		parent.getHalleyAPI().core->quit(0);
 	} else {
 		if (!hasUI) {

@@ -26,7 +26,32 @@ Settings& HalleyLauncher::getSettings()
 }
 
 void HalleyLauncher::init(const Environment& environment, const Vector<String>& args)
-{}
+{
+	enum class ArgType {
+		None,
+		ProjectPath,
+	};
+
+	ArgType type = ArgType::None;
+	projectPath = {};
+
+	for (auto& arg : args) {
+		if (arg.startsWith("--")) {
+			if (arg == "--project") {
+				type = ArgType::ProjectPath;
+			}
+		} else {
+			if (type == ArgType::ProjectPath) {
+				if (!projectPath) {
+					projectPath = arg;
+				} else {
+					*projectPath += " " + arg;
+				}
+			}
+		}
+	}
+
+}
 
 int HalleyLauncher::initPlugins(IPluginRegistry& registry)
 {
@@ -70,7 +95,7 @@ std::unique_ptr<Stage> HalleyLauncher::startGame()
 	api.video->setWindow(WindowDefinition(WindowType::Window, Vector2i(800, 500), "Halley Launcher"));
 	api.video->setVsync(true);
 
-	return std::make_unique<LauncherStage>();
+	return std::make_unique<LauncherStage>(projectPath);
 }
 
 String HalleyLauncher::getName() const
