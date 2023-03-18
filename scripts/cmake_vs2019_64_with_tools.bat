@@ -4,7 +4,7 @@ cd build
 cmake -G "Visual Studio 16 2019" ^
     -A x64 ^
     -DHALLEY_PATH=../halley ^
-    -DCMAKE_INCLUDE_PATH="%~dp0\..\halley\deps\include;lib\include" ^
+    -DCMAKE_INCLUDE_PATH="%~dp0\..\halley\deps\include" ^
     -DCMAKE_LIBRARY_PATH="%~dp0\..\halley\deps\lib64" ^
     -DBOOST_INCLUDEDIR="%~dp0\..\halley\deps\Boost\include\boost-1_81" ^
     -DBUILD_HALLEY_TOOLS=1 ^
