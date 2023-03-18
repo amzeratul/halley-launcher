@@ -27,5 +27,7 @@ std::optional<ProjectProperties> ProjectProperties::getProjectProperties(const P
 		result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "build_version.txt"));
 	}
 
+	result.cleanBuildIfOlderVersion.parse(Path::readFileString(path / "halley" / "include" / "clean_build_if_older.txt"));
+
 	return result;
 }

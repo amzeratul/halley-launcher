@@ -18,7 +18,7 @@ packs:
       - ~:textFile
       - ~:audioEvent
       - ~:variableTable
-      - ~:binaryFile:lua
+      - ~:binaryFile
       - ~:uiDefinition
       - ~:gameProperties
       - ~:prefab

@@ -1,0 +1,17 @@
+version: 1
+download:
+  win64:
+    url: https://update.halley.io/halley-launcher.zip
+    signature: !!binary |
+      GGIgCEf0VZ+zoVoYyE4B0nF/G6DIv9RsoUEKO649g0yv2AurWQ6dstbNM7BFtlD7
+      ntnmdmXr94BYfN74zTI5+ndvfBVsQfAgY1/5fPL8L50iySKz9KyIpCsQFzVuMbUh
+      nUUhtjwsEOyxhKRaiEl0Ppq87y7Q4rdGgDRw7gQs0TASStKcO6L9UJhve+WUKhS6
+      YGlhnLoITyLeb0gHoV+A901H8/hnW4mLTtUyCoJLIEkQtdgWiHhjS7QaOC1nwGUh
+      SjCwZYuid35ItiMz/NFEuRifYNaiYjiTAJUCY4BLfUkxazSto81njpx2xWiohQsl
+      oviComlFdnyffG0mUornfzGKRouIwDwxCGXalNh1QiU4RvOxQ4sSRUneF9jexYWV
+      WdyWJ64Oo0ME+qM04abF7M0rqH5Gr6wrRQnHc4u5o0ZrrlbFQLvLxdkodspChRNW
+      9Y/FcJivvHC0h/qbBaZ6QxLPwtLC5yuoq95Bhgu/nFuBgyzhAs4h42WxvLz17mpZ
+      begb4bts+xe7AZNupSPI9Q7yL8edHOfAxRvBhnPYzq08dw60spn1ZwkbxDjmB5ft
+      5aoKVfbQ6MiKseIQ2Y9PsquZWEW9GS+J1FUQnI44G9vkNWnjmNvHn41BVp+nxc/3
+      0LebzcD7grnhsAfW3YqpNUyVqsUGekO6koXdf+x4TLQ=
+

@@ -8,7 +8,8 @@ public:
     constexpr static int currentVersion = 1;
     
     int version;
-    String download;
+    String downloadURL;
+    Bytes signature;
 
     bool isNewVersion() const;
 

@@ -16,7 +16,7 @@ LaunchProject::LaunchProject(UIFactory& factory, Settings& settings, ILauncher& 
 		parent.switchTo("choose_project");
 	} else if (properties->builtVersion != properties->halleyVersion) {
 		factory.loadUI(*this, "launcher/launch_project");
-		buildProject();
+		buildProject(properties->builtVersion < properties->cleanBuildIfOlderVersion);
 	} else {
 		launchProject();
 	}
@@ -32,11 +32,13 @@ void LaunchProject::onMakeUI()
 			runningCommand.cancel();
 			runningCommand = {};
 		}
-		parent.switchTo("choose_project");
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			parent.switchTo("choose_project");
+		});
 	});
 }
 
-void LaunchProject::buildProject()
+void LaunchProject::buildProject(bool clean)
 {
 	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Building..."));
 
@@ -49,7 +51,7 @@ void LaunchProject::buildProject()
 		}
 	}();
 	const auto buildScript = path / "halley" / "scripts" / scriptName;
-	const auto command = "\"" + buildScript.getNativeString() + "\" \"";
+	const auto command = "\"" + buildScript.getNativeString() + "\"" + (clean ? " --clean" : "");
 
 	runningCommand = OS::get().runCommandAsync(command, path.getNativeString(false), this);
 	runningCommand.then(Executors::getMainUpdateThread(), [=] (int returnValue)

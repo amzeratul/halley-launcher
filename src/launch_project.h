@@ -26,7 +26,7 @@ namespace Halley {
         bool hasUI = false;
 
         HalleyVersion getBuiltVersion(const Path& path) const;
-        void buildProject();
+        void buildProject(bool clean);
         void launchProject();
     };
 }

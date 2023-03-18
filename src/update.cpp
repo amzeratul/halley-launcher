@@ -27,13 +27,15 @@ void Update::onMakeUI()
 {
 	setHandle(UIEventType::ButtonClicked, "cancel", [=] (const UIEvent& event)
 	{
-		parent.switchTo("choose_project");
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			parent.switchTo("choose_project");
+		});
 	});
 }
 
 void Update::onAddedToRoot(UIRoot& root)
 {
-	download(info.download);
+	download(info.downloadURL);
 }
 
 void Update::update(Time t, bool moved)
@@ -73,7 +75,7 @@ void Update::onDownloadComplete(int responseCode, Bytes bytes, String redirect, 
 		return;
 	} else if (responseCode != 200) {
 		downloading = false;
-		onError("HTTP Error " + toString(responseCode) + ": " + info.download);
+		onError("HTTP Error " + toString(responseCode) + ": " + info.downloadURL);
 		return;
 	}
 
@@ -188,6 +190,6 @@ void Update::doUpdateProgress()
 
 bool Update::isValidSignature(const Bytes& bytes)
 {
-	// TODO: needs cryptography support
-	return true;
+	const auto publicKey = factory.getResources().get<BinaryFile>("binary/halley-launcher.pub");
+	return Cryptography::verifySignature(Cryptography::HashAlgorithm::SHA256, publicKey->getSpan(), info.signature.byte_span(), bytes.byte_span());
 }
