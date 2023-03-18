@@ -30,8 +30,8 @@ namespace Halley {
 
         std::optional<std::pair<uint64_t, uint64_t>> latestProgress;
 
-        void download();
-        void onDownloadComplete(Bytes bytes);
+        void download(const String& url, int depth = 0);
+        void onDownloadComplete(int responseCode, Bytes bytes, String redirect, int depth);
 
         void extract(Bytes bytes);
 

@@ -20,7 +20,7 @@ void LauncherStage::init()
 	makeUI();
 	makeSprites();
 
-	newVersionCheck = getWebAPI().makeHTTPRequest(HTTPMethod::GET, "http://update.halley.io/halley-launcher.yaml")->send()
+	newVersionCheck = getWebAPI().makeHTTPRequest(HTTPMethod::GET, "https://update.halley.io/halley-launcher.yaml")->send()
 		.then([] (std::unique_ptr<HTTPResponse> response) -> NewVersionInfo
 	{
 		if (response->getResponseCode() == 200) {

@@ -33,7 +33,7 @@ void Update::onMakeUI()
 
 void Update::onAddedToRoot(UIRoot& root)
 {
-	download();
+	download(info.download);
 }
 
 void Update::update(Time t, bool moved)
@@ -41,10 +41,10 @@ void Update::update(Time t, bool moved)
 	doUpdateProgress();
 }
 
-void Update::download()
+void Update::download(const String& url, int depth)
 {
 	downloading = true;
-	auto request = parent.getHalleyAPI().web->makeHTTPRequest(HTTPMethod::GET, info.download);
+	auto request = parent.getHalleyAPI().web->makeHTTPRequest(HTTPMethod::GET, url);
 	auto weakThis = weak_from_this();
 	updateDownloadProgress(0, 1);
 	request->setProgressCallback([weakThis] (uint64_t cur, uint64_t total) -> bool
@@ -59,19 +59,24 @@ void Update::download()
 		return !!ptr;
 	});
 	downloadFuture = request->send();
-	downloadFuture.then(Executors::getMainUpdateThread(), [this](std::unique_ptr<HTTPResponse> response)
+	downloadFuture.then(Executors::getMainUpdateThread(), [this, depth](std::unique_ptr<HTTPResponse> response)
 	{
-		if (response->getResponseCode() == 200) {
-			onDownloadComplete(response->moveBody());
-		} else {
-			onError("HTTP Error " + toString(response->getResponseCode()) + ": " + info.download);
-		}
+		onDownloadComplete(response->getResponseCode(), response->moveBody(), response->getRedirectLocation(), depth);
 	});
 }
 
-void Update::onDownloadComplete(Bytes bytes)
+void Update::onDownloadComplete(int responseCode, Bytes bytes, String redirect, int depth)
 {
 	downloading = false;
+	if (responseCode == 301 && depth < 3) {
+		download(redirect, depth + 1);
+		return;
+	} else if (responseCode != 200) {
+		downloading = false;
+		onError("HTTP Error " + toString(responseCode) + ": " + info.download);
+		return;
+	}
+
 	latestProgress = {};
 	showMessage("Checking file...");
 
@@ -96,7 +101,11 @@ void Update::extract(Bytes bytes)
 	});
 
 	ZipFile zip;
-	zip.open(std::move(bytes));
+	bool success = zip.open(std::move(bytes));
+	if (!success) {
+		onError("Invalid file.");
+		return;
+	}
 
 	size_t totalSize = 0;
 	const auto n = zip.getNumFiles();
@@ -140,6 +149,7 @@ void Update::runUpdate()
 void Update::onError(const String& error)
 {
 	showMessage(error);
+	latestProgress = std::nullopt;
 	getWidget("progress_bg")->setActive(false);
 }
 
