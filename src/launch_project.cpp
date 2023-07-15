@@ -4,12 +4,13 @@
 #include "project_properties.h"
 using namespace Halley;
 
-LaunchProject::LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path)
+LaunchProject::LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path, bool safeMode)
 	: UIWidget("launch_project", Vector2f(), UISizer())
 	, factory(factory)
 	, settings(settings)
 	, parent(parent)
 	, path(std::move(path))
+	, safeMode(safeMode)
 {
 	const auto properties = ProjectProperties::getProjectProperties(this->path);
 	if (!properties) {
@@ -75,7 +76,9 @@ void LaunchProject::launchProject()
 
 	const auto dir = path / "halley" / "bin";
 	const auto cmd = dir / "halley-editor.exe";
-	const auto params = "--project \"" + path.getNativeString(false) + "\" --launcher \"" + (parent.getHalleyAPI().core->getEnvironment().getProgramPath() / "halley-launcher.exe").getNativeString() + "\"";
+	const auto params = "--project \"" + path.getNativeString(false)
+		+ "\" --launcher \"" + (parent.getHalleyAPI().core->getEnvironment().getProgramPath() / "halley-launcher.exe").getNativeString() + "\""
+		+ (safeMode ? " --dont-load-dll" : "");
 
 	if (Path::exists(cmd) && OS::get().runCommandDetached(cmd.getNativeString() + " " + params, dir.getNativeString(false))) {
 		parent.getHalleyAPI().core->quit(0);

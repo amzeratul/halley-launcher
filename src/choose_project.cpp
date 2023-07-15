@@ -31,6 +31,8 @@ void ChooseProject::onMakeUI()
 	auto logo = getWidgetAs<UIImage>("logo");
 	logo->setActive(true);
 	logo->setSprite(std::move(halleyLogo));
+
+	onProjectSelected({});
 	
 	setHandle(UIEventType::ButtonClicked, "new", [=] (const UIEvent& event)
 	{
@@ -48,11 +50,25 @@ void ChooseProject::onMakeUI()
 			onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId());
 		});
 	});
+	
+	setHandle(UIEventType::ButtonClicked, "openSafe", [=] (const UIEvent& event)
+	{
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId(), true);
+		});
+	});
 
 	setHandle(UIEventType::ButtonClicked, "updateLauncher", [=] (const UIEvent& event)
 	{
 		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
 			onUpdateLauncher();
+		});
+	});
+
+	setHandle(UIEventType::ListSelectionChanged, "projects", [=](const UIEvent& event)
+	{
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			onProjectSelected(event.getStringData());
 		});
 	});
 
@@ -87,10 +103,26 @@ void ChooseProject::onAdd()
 	});
 }
 
-void ChooseProject::onOpen(const Path& path)
+void ChooseProject::onOpen(const Path& path, bool safeMode)
 {
-	settings.bumpProject(path.getString());
-	parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, path));
+	if (!path.isEmpty()) {
+		settings.bumpProject(path.getString());
+		parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, path, safeMode));
+	}
+}
+
+void ChooseProject::onProjectSelected(const Path& path)
+{
+	bool enabled = false;
+	bool safeEnabled = false;
+	if (!path.isEmpty()) {
+		if (const auto properties = ProjectProperties::getProjectProperties(Path(path), &factory.getResources(), &videoAPI)) {
+			enabled = true;
+			safeEnabled = properties->halleyVersion >= HalleyVersion{3, 3, 79};
+		}
+	}
+	getWidget("open")->setEnabled(enabled);
+	getWidget("openSafe")->setEnabled(safeEnabled);
 }
 
 void ChooseProject::onUpdateLauncher()
@@ -142,8 +174,10 @@ void ChooseProject::addPathToList(const ProjectProperties& properties)
 
 	entry->setHandle(UIEventType::ButtonClicked, "delete", [=] (const UIEvent& event)
 	{
-		settings.removeProject(id);
-		list->removeItem(id);
+		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
+			settings.removeProject(id);
+			list->removeItem(id);
+		});
 	});
 
 	list->addItem(id, std::move(entry), 1);

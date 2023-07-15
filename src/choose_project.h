@@ -23,7 +23,8 @@ namespace Halley {
         
         void onNew();
         void onAdd();
-        void onOpen(const Path& path);
+        void onOpen(const Path& path, bool safeMode = false);
+        void onProjectSelected(const Path& path);
         void onUpdateLauncher();
 
     	void loadPaths();

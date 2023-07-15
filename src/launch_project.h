@@ -9,7 +9,7 @@ namespace Halley {
 
 	class LaunchProject : public UIWidget, ILoggerSink {
     public:
-    	LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path);
+    	LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path, bool safeMode);
 
         void onMakeUI() override;
         
@@ -21,6 +21,7 @@ namespace Halley {
         Settings& settings;
         ILauncher& parent;
         Path path;
+        bool safeMode;
 
         Future<int> runningCommand;
         bool hasUI = false;

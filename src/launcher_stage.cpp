@@ -34,11 +34,6 @@ void LauncherStage::init()
 
 void LauncherStage::onVariableUpdate(Time time)
 {
-	auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
-	if (settings.isDirty()) {
-		settings.saveToFile(getSystemAPI());
-	}
-
 	mainThreadExecutor.runPending();
 
 	if (newVersionCheck.isValid() && newVersionCheck.hasValue()) {
@@ -47,6 +42,11 @@ void LauncherStage::onVariableUpdate(Time time)
 	}
 
 	updateUI(time);
+
+	auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+	if (settings.isDirty()) {
+		settings.saveToFile(getSystemAPI());
+	}
 }
 
 void LauncherStage::onRender(RenderContext& context) const
@@ -126,7 +126,7 @@ void LauncherStage::makeUI()
 
 	if (initialProject) {
 		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
-		switchTo(std::make_shared<LaunchProject>(*uiFactory, settings, *this, *initialProject));
+		switchTo(std::make_shared<LaunchProject>(*uiFactory, settings, *this, *initialProject, false));
 	} else {
 		switchTo("choose_project");
 	}

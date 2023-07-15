@@ -76,10 +76,19 @@ children:
   - uuid: 14f589ef-f890-4fe3-a5da-88871778c594
     sizer:
       columnProportions: []
+      gap: 4
     children:
       - uuid: 29e44461-b198-45e3-9070-e98eea1ea88c
         proportion: 1
         spacer: {}
+      - uuid: 7b54e0b9-74c1-4a05-a1c6-7267ed38ab5f
+        sizer:
+          columnProportions: []
+        widget:
+          class: button
+          id: openSafe
+          size: [150, 0]
+          text: Open (Safe mode)
       - uuid: b77d7824-eef0-4bcd-bd65-c15a59e4df01
         sizer:
           columnProportions: []
