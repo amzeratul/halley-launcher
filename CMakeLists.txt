@@ -14,34 +14,6 @@ if(NOT (DEFINED HALLEY_GAME_BIN_DIR))
 	set(HALLEY_GAME_BIN_DIR "bin")
 endif()
 
-set (SOURCES
-	"prec.cpp"
-
-	"src/choose_project.cpp"
-	"src/launch_project.cpp"
-	"src/launcher.cpp"
-	"src/launcher_save_data.cpp"
-	"src/launcher_stage.cpp"
-	"src/new_version_info.cpp"
-	"src/project_properties.cpp"
-	"src/settings.cpp"
-	"src/update.cpp"
-	)
-
-set (HEADERS
-	"prec.h"
-
-	"src/choose_project.h"
-	"src/launch_project.h"
-	"src/launcher.h"
-	"src/launcher_save_data.h"
-	"src/launcher_stage.h"
-	"src/new_version_info.h"
-	"src/project_properties.h"
-	"src/settings.h"
-	"src/update.h"
-	)
-
 if (MSVC)
 	set (RESOURCES
 		"res/halley-launcher.rc"
@@ -50,8 +22,7 @@ if (MSVC)
 	)
 endif ()
 
-#include_directories(${FREETYPE_INCLUDE_DIR} "../tools/include")
+file(STRINGS "source_list.txt" SOURCES)
+set_directory_properties(PROPERTIES CMAKE_CONFIGURE_DEPENDS "source_list.txt")
 
-halleyProject(halley-launcher "${SOURCES}" "${HEADERS}" "${RESOURCES}" "${GEN_DEFINITIONS}" ${CMAKE_CURRENT_SOURCE_DIR}/${HALLEY_GAME_BIN_DIR})
-
-#target_link_libraries (halley-launcher halley-tools)
+halleyProjectV2(halley-launcher "${SOURCES}" "${RESOURCES}" ${CMAKE_CURRENT_SOURCE_DIR}/${HALLEY_GAME_BIN_DIR})

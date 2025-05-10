@@ -24,7 +24,7 @@ namespace Halley
 		std::unique_ptr<Stage> startGame() override;
 
 		String getName() const override;
-		String getDataPath() const override;
+		String getDataPath(const Vector<String>& args) const override;
 		bool isDevMode() const override;
 		bool shouldCreateSeparateConsole() const override;
 

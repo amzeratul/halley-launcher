@@ -63,7 +63,8 @@ void LauncherStage::onRender(RenderContext& context) const
 
 		// UI
 		SpritePainter spritePainter;
-		spritePainter.start();
+		spritePainter.startFrame(false);
+		spritePainter.startRender(false, false, {});
 		ui->draw(spritePainter, 1, 0);
 		spritePainter.draw(1, painter);
 	});

@@ -103,7 +103,7 @@ String HalleyLauncher::getName() const
 	return "Halley Launcher";
 }
 
-String HalleyLauncher::getDataPath() const
+String HalleyLauncher::getDataPath(const Vector<String>& args) const
 {
 	return "halley/launcher";
 }
