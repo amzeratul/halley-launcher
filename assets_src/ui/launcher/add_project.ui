@@ -1,0 +1,83 @@
+uuid: cc93ef38-b588-4029-9279-7c81f72ced50
+sizer:
+  columnProportions: []
+  gap: 4
+  type: vertical
+widget:
+  class: widget
+children:
+  - uuid: 6e3f2335-264d-4d4b-a687-e8042677d2a6
+    sizer:
+      columnProportions: []
+      gap: 4
+      type: vertical
+    widget:
+      class: widget
+      id: addTypePage
+    children:
+      - uuid: 27ffb468-f4e9-44e8-bc01-6147b4235266
+        widget:
+          class: button
+          enabled: false
+          id: create
+          text: Create new project...
+      - uuid: 86d8688d-8783-47bc-9737-b740432c8ba9
+        widget:
+          class: button
+          id: addLocal
+          text: Open local project...
+      - uuid: 26e50c07-9bf3-42b2-9424-0827d502dd6d
+        widget:
+          class: button
+          id: addURL
+          text: Open from URL...
+  - uuid: 0daef1dc-dca6-4d13-84c5-8ed651af1e69
+    sizer:
+      columnProportions: []
+      gap: 4
+      type: vertical
+    widget:
+      class: widget
+      id: addURLPage
+    children:
+      - uuid: 5d53c4ca-1eb2-480d-9f9e-228f69ae0972
+        sizer:
+          columnProportions:
+            - ~
+            - 1
+          columns: 2
+          type: grid
+        widget:
+          class: widget
+        children:
+          - uuid: a90bc3c2-3cb3-4dff-97c4-9cc400bd9a39
+            border: [0, 0, 4, 0]
+            widget:
+              class: label
+              text: "URL: "
+            fill: [fillHorizontal, centreVertical]
+          - uuid: 2e46ea1c-40c5-4434-abeb-8428a157dccb
+            border: [0, 0, 0, 0]
+            widget:
+              class: textInput
+              id: url
+      - uuid: d08cee39-9d28-4b83-a48a-959379175ee5
+        widget:
+          class: button
+          id: addURL2
+          text: Open from URL
+  - uuid: 2db1c8fb-77b1-47d2-9d08-7b0852c2ca8b
+    sizer:
+      columnProportions: []
+    children:
+      - uuid: b84b6094-d502-4fcc-ac6c-85a2c87fa352
+        proportion: 1
+        spacer: {}
+      - uuid: 5c9e9284-d01a-433c-90de-37fc1574fe6e
+        sizer:
+          columnProportions: []
+        widget:
+          class: button
+          id: cancel
+          size: [100, 0]
+          text: Cancel

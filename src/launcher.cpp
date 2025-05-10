@@ -1,7 +1,7 @@
 #include "launcher.h"
 
 #include "launcher_stage.h"
-#include "settings.h"
+#include "launcher_settings.h"
 
 using namespace Halley;
 
@@ -20,7 +20,7 @@ HalleyLauncher::HalleyLauncher()
 HalleyLauncher::~HalleyLauncher()
 {}
 
-Settings& HalleyLauncher::getSettings()
+LauncherSettings& HalleyLauncher::getSettings()
 {
 	return *settings;
 }
@@ -89,7 +89,7 @@ ResourceOptions HalleyLauncher::initResourceLocator(const Path& gamePath, const 
 std::unique_ptr<Stage> HalleyLauncher::startGame()
 {
 	auto& api = getAPI();
-	settings = std::make_unique<Settings>();
+	settings = std::make_unique<LauncherSettings>();
 	settings->loadFromFile(*api.system);
 
 	api.video->setWindow(WindowDefinition(WindowType::Window, Vector2i(800, 500), "Halley Launcher"));

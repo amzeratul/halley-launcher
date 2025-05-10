@@ -1,13 +1,15 @@
-#include "project_properties.h"
+#include "launcher_project_properties.h"
 
-std::optional<ProjectProperties> ProjectProperties::getProjectProperties(const Path& path, Resources* resources, VideoAPI* videoAPI)
+std::optional<LauncherProjectProperties> LauncherProjectProperties::getProjectProperties(const ProjectLocation& project, Resources* resources, VideoAPI* videoAPI)
 {
+	const auto& path = Path(project.path);
+
 	const auto propertiesBytes = Path::readFile(path / "halley_project" / "properties.yaml");
 	if (propertiesBytes.empty()) {
 		return {};
 	}
 
-	ProjectProperties result;
+	LauncherProjectProperties result;
 
 	if (resources && videoAPI) {
 		const auto iconBytes = Path::readFile(path / "halley_project" / "icon48.png");
@@ -21,7 +23,12 @@ std::optional<ProjectProperties> ProjectProperties::getProjectProperties(const P
 	result.name = config.getRoot()["name"].asString("Unknown");
 	result.path = path;
 
-	result.halleyVersion.parseHeader(Path::readFileLines(path / "halley" / "include" / "halley_version.hpp"));
+	const auto halleyVersionPath = path / "halley" / "include" / "halley_version.hpp";
+	if (Path::exists(halleyVersionPath)) {
+		result.halleyVersion.parseHeader(Path::readFileLines(halleyVersionPath));
+	} else {
+		result.halleyVersion.parse(config.getRoot()["halleyVersion"].asString("0.0.0"));
+	}
 
 	if (Path::exists(path / "halley" / "bin" / "halley-editor.exe")) {
 		result.builtVersion.parse(Path::readFileString(path / "halley" / "bin" / "build_version.txt"));

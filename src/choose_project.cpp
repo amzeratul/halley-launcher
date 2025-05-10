@@ -2,10 +2,10 @@
 
 #include "launcher_stage.h"
 #include "launch_project.h"
-#include "settings.h"
+#include "launcher_settings.h"
 using namespace Halley;
 
-ChooseProject::ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings, ILauncher& parent)
+ChooseProject::ChooseProject(UIFactory& factory, VideoAPI& videoAPI, LauncherSettings& settings, ILauncher& parent)
 	: UIWidget("choose_project", {}, UISizer())
 	, factory(factory)
 	, videoAPI(videoAPI)
@@ -78,6 +78,8 @@ void ChooseProject::onMakeUI()
 			onOpen(event.getStringData());
 		});
 	});
+
+	getWidgetAs<UILabel>("version")->setText(LocalisedString::fromUserString("v" + toString(NewVersionInfo::currentVersion)));
 }
 
 void ChooseProject::update(Time t, bool moved)
@@ -98,27 +100,27 @@ void ChooseProject::onAdd()
 	OS::get().openFileChooser(parameters).then(Executors::getMainUpdateThread(), [=] (std::optional<Path> path)
 	{
 		if (path) {
-			addNewPath(path.value());
+			addNewProject(ProjectLocation(path.value().getNativeString(false)));
 		}
 	});
 }
 
-void ChooseProject::onOpen(const Path& path, bool safeMode)
+void ChooseProject::onOpen(const String& path, bool safeMode)
 {
-	if (!path.isEmpty()) {
-		settings.bumpProject(path.getString());
-		parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, path, safeMode));
+	if (const auto* project = settings.tryGetProject(path)) {
+		settings.bumpProject(path);
+		parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, *project, safeMode));
 	}
 }
 
-void ChooseProject::onProjectSelected(const Path& path)
+void ChooseProject::onProjectSelected(const String& path)
 {
 	bool enabled = false;
 	bool safeEnabled = false;
-	if (!path.isEmpty()) {
-		if (const auto properties = ProjectProperties::getProjectProperties(Path(path), &factory.getResources(), &videoAPI)) {
+	if (const auto* project = settings.tryGetProject(path)) {
+		if (const auto properties = LauncherProjectProperties::getProjectProperties(*project, &factory.getResources(), &videoAPI)) {
 			enabled = true;
-			safeEnabled = properties->halleyVersion >= HalleyVersion{3, 3, 79};
+			safeEnabled = properties->halleyVersion >= HalleyVersion{ 3, 3, 79 };
 		}
 	}
 	getWidget("open")->setEnabled(enabled);
@@ -133,11 +135,11 @@ void ChooseProject::onUpdateLauncher()
 void ChooseProject::loadPaths()
 {
 	Vector<String> toRemove;
-	for (const auto& path: settings.getProjects()) {
-		if (auto properties = ProjectProperties::getProjectProperties(Path(path), &factory.getResources(), &videoAPI)) {
+	for (const auto& project: settings.getProjects()) {
+		if (auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), &videoAPI)) {
 			addPathToList(*properties);
 		} else {
-			toRemove.push_back(path);
+			toRemove.push_back(project.path);
 		}
 	}
 	for (const auto& path: toRemove) {
@@ -145,10 +147,10 @@ void ChooseProject::loadPaths()
 	}
 }
 
-void ChooseProject::addNewPath(const Path& path)
+void ChooseProject::addNewProject(const ProjectLocation& project)
 {
-	if (const auto properties = ProjectProperties::getProjectProperties(path, &factory.getResources(), &videoAPI)) {
-		const bool added = settings.addProject(path.toString());
+	if (const auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), &videoAPI)) {
+		const bool added = settings.addProject(project.path);
 		if (added) {
 			addPathToList(*properties);
 		}
@@ -157,7 +159,7 @@ void ChooseProject::addNewPath(const Path& path)
 	}
 }
 
-void ChooseProject::addPathToList(const ProjectProperties& properties)
+void ChooseProject::addPathToList(const LauncherProjectProperties& properties)
 {
 	const auto list = getWidgetAs<UIList>("projects");
 

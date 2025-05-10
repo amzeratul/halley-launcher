@@ -1,18 +1,18 @@
 #include "launch_project.h"
 
 #include "launcher_stage.h"
-#include "project_properties.h"
+#include "launcher_project_properties.h"
 using namespace Halley;
 
-LaunchProject::LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path, bool safeMode)
+LaunchProject::LaunchProject(UIFactory& factory, LauncherSettings& settings, ILauncher& parent, ProjectLocation project, bool safeMode)
 	: UIWidget("launch_project", Vector2f(), UISizer())
 	, factory(factory)
 	, settings(settings)
 	, parent(parent)
-	, path(std::move(path))
+	, project(std::move(project))
 	, safeMode(safeMode)
 {
-	const auto properties = ProjectProperties::getProjectProperties(this->path);
+	const auto properties = LauncherProjectProperties::getProjectProperties(this->project);
 	if (!properties) {
 		parent.switchTo("choose_project");
 	} else if (properties->builtVersion != properties->halleyVersion) {
@@ -51,10 +51,10 @@ void LaunchProject::buildProject(bool clean)
 			throw Exception("No project build script available for this platform.", HalleyExceptions::Tools);
 		}
 	}();
-	const auto buildScript = path / "halley" / "scripts" / scriptName;
+	const auto buildScript = Path(project.path) / "halley" / "scripts" / scriptName;
 	const auto command = "\"" + buildScript.getNativeString() + "\"" + (clean ? " --clean" : "");
 
-	runningCommand = OS::get().runCommandAsync(command, path.getNativeString(false), this);
+	runningCommand = OS::get().runCommandAsync(command, project.path, this);
 	runningCommand.then(Executors::getMainUpdateThread(), [=] (int returnValue)
 	{
 		if (returnValue == 0) {
@@ -74,9 +74,9 @@ void LaunchProject::launchProject()
 		getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
 	}
 
-	const auto dir = path / "halley" / "bin";
+	const auto dir = Path(project.path) / "halley" / "bin";
 	const auto cmd = dir / "halley-editor.exe";
-	const auto params = "--project \"" + path.getNativeString(false)
+	const auto params = "--project \"" + project.path
 		+ "\" --launcher \"" + (parent.getHalleyAPI().core->getEnvironment().getProgramPath() / "halley-launcher.exe").getNativeString() + "\""
 		+ (safeMode ? " --dont-load-dll" : "");
 

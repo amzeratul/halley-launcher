@@ -34,16 +34,6 @@ children:
       - uuid: 2bdc6567-0672-499f-b462-725f6d7042fd
         proportion: 1
         stretchSpacer: {}
-      - uuid: 2593b651-3b48-4b5f-879b-6b4262cae612
-        sizer:
-          columnProportions: []
-        widget:
-          class: button
-          enabled: false
-          id: new
-          size: [120, 0]
-          text: New Project
-          tooltip: Creates a new project from scratch
       - uuid: 2a5afd90-6563-4d80-9ec2-4b6b03a2a0fb
         sizer:
           columnProportions: []
@@ -51,8 +41,8 @@ children:
           class: button
           id: add
           size: [120, 22]
-          text: Add Project
-          tooltip: Opens an existing Halley Project
+          text: Add Project...
+          tooltip: Creates a new Halley project, or opens an existing one
   - uuid: 63249efb-5f37-4b64-a7fb-793bbc4ffc3d
     proportion: 1
     border: [0, 0, 0, 0]
@@ -60,6 +50,7 @@ children:
       columnProportions: []
       type: vertical
     widget:
+      autoHide: true
       class: scrollBarPane
       size: [500, 200]
     children:
@@ -78,6 +69,14 @@ children:
       columnProportions: []
       gap: 4
     children:
+      - uuid: 8bc5f5a1-d159-4d20-b9b5-f4b4d08418a3
+        widget:
+          class: label
+          colour: "#ffffff80"
+          font: Ubuntu Light
+          id: version
+          text: Version
+        fill: [fillHorizontal, bottom]
       - uuid: 29e44461-b198-45e3-9070-e98eea1ea88c
         proportion: 1
         spacer: {}

@@ -1,16 +1,16 @@
 #pragma once
 
 #include <halley.hpp>
-#include "project_properties.h"
+#include "launcher_project_properties.h"
 
-class Settings;
+class LauncherSettings;
 
 namespace Halley {
 	class ILauncher;
 
 	class ChooseProject : public UIWidget {
     public:
-    	ChooseProject(UIFactory& factory, VideoAPI& videoAPI, Settings& settings, ILauncher& parent);
+    	ChooseProject(UIFactory& factory, VideoAPI& videoAPI, LauncherSettings& settings, ILauncher& parent);
 
         void onMakeUI() override;
         void update(Time t, bool moved) override;
@@ -18,17 +18,17 @@ namespace Halley {
     private:
     	UIFactory& factory;
         VideoAPI& videoAPI;
-        Settings& settings;
+        LauncherSettings& settings;
         ILauncher& parent;
         
         void onNew();
         void onAdd();
-        void onOpen(const Path& path, bool safeMode = false);
-        void onProjectSelected(const Path& path);
+        void onOpen(const String& path, bool safeMode = false);
+        void onProjectSelected(const String& path);
         void onUpdateLauncher();
 
     	void loadPaths();
-    	void addNewPath(const Path& path);
-        void addPathToList(const ProjectProperties& properties);
+    	void addNewProject(const ProjectLocation& project);
+        void addPathToList(const LauncherProjectProperties& properties);
     };
 }

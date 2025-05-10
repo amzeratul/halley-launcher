@@ -2,14 +2,16 @@
 
 #include <halley.hpp>
 
-class Settings;
+#include "launcher_settings.h"
+
+class LauncherSettings;
 
 namespace Halley {
 	class ILauncher;
 
 	class LaunchProject : public UIWidget, ILoggerSink {
     public:
-    	LaunchProject(UIFactory& factory, Settings& settings, ILauncher& parent, Path path, bool safeMode);
+    	LaunchProject(UIFactory& factory, LauncherSettings& settings, ILauncher& parent, ProjectLocation project, bool safeMode);
 
         void onMakeUI() override;
         
@@ -18,9 +20,9 @@ namespace Halley {
 
     private:
     	UIFactory& factory;
-        Settings& settings;
+        LauncherSettings& settings;
         ILauncher& parent;
-        Path path;
+        ProjectLocation project;
         bool safeMode;
 
         Future<int> runningCommand;

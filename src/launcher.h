@@ -2,7 +2,7 @@
 
 #include <halley.hpp>
 
-#include "settings.h"
+#include "launcher_settings.h"
 
 namespace Halley
 {
@@ -12,10 +12,10 @@ namespace Halley
 		HalleyLauncher();
 		~HalleyLauncher();
 
-		Settings& getSettings();
+		LauncherSettings& getSettings();
 
 	protected:
-		std::unique_ptr<Settings> settings;
+		std::unique_ptr<LauncherSettings> settings;
 		std::optional<String> projectPath;
 
 		void init(const Environment& environment, const Vector<String>& args) override;

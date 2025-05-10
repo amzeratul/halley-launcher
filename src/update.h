@@ -4,7 +4,7 @@
 
 #include "new_version_info.h"
 
-class Settings;
+class LauncherSettings;
 
 namespace Halley {
 	class ILauncher;
