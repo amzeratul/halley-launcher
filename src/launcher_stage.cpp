@@ -15,7 +15,8 @@ LauncherStage::LauncherStage(std::optional<String> initialProject)
 
 void LauncherStage::init()
 {
-	webClient = std::make_unique<WebClient>(getWebAPI(), getSettings());
+	auto webProjectsPath = getCoreAPI().getEnvironment().getDataPath() / "web_projects";
+	webClient = std::make_unique<WebClient>(getWebAPI(), getSettings(), webProjectsPath);
 	saveData = std::make_shared<LauncherSaveData>(getSystemAPI().getStorageContainer(SaveDataType::SaveLocal));
 	
 	makeUI();

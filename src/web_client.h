@@ -5,8 +5,7 @@ class LauncherSettings;
 using namespace Halley;
 
 struct WebProjectData {
-	Bytes properties;
-	Bytes icon;
+	Vector<std::pair<String, Bytes>> files;
 
 	WebProjectData() = default;
 	WebProjectData(const ConfigNode& node);
@@ -14,13 +13,15 @@ struct WebProjectData {
 
 class WebClient {
 public:
-	WebClient(WebAPI& webAPI, LauncherSettings& settings);
+	WebClient(WebAPI& webAPI, LauncherSettings& settings, Path projectsFolder);
 
 	Future<bool> updateProjectData(const String& url, const String& project, const String& username, const String& password);
+	Future<Bytes> downloadEditor(HalleyVersion version, std::function<bool(uint64_t, uint64_t)> progressCallback = {});
 
 private:
 	WebAPI& webAPI;
 	LauncherSettings& settings;
+	Path projectsFolder;
 	AliveFlag aliveFlag;
 
 	Future<std::optional<WebProjectData>> getProjectData(const String& url, const String& project, const String& username, const String& password);

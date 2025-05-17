@@ -22,14 +22,21 @@ namespace Halley {
     	UIFactory& factory;
         LauncherSettings& settings;
         ILauncher& parent;
-        ProjectLocation project;
+        ProjectLocation projectLocation;
         bool safeMode;
+        AliveFlag aliveFlag;
 
         Future<int> runningCommand;
         bool hasUI = false;
 
+        void loadUIIfNeeded();
+        void tryLaunching();
         HalleyVersion getBuiltVersion(const Path& path) const;
         void buildProject(bool clean);
+        void downloadEditor(HalleyVersion version);
+        bool installEditor(Bytes data);
         void launchProject();
+
+        void checkForProjectUpdates();
     };
 }

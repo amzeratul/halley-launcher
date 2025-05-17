@@ -1,10 +1,13 @@
 #include "web_client.h"
 
+#include <filesystem>
+
 #include "launcher_settings.h"
 
-WebClient::WebClient(WebAPI& webAPI, LauncherSettings& settings)
+WebClient::WebClient(WebAPI& webAPI, LauncherSettings& settings, Path projectsFolder)
 	: webAPI(webAPI)
 	, settings(settings)
+	, projectsFolder(std::move(projectsFolder))
 {
 }
 
@@ -19,7 +22,7 @@ Future<bool> WebClient::updateProjectData(const String& url, const String& proje
 				params["project"] = project;
 				params["username"] = username;
 				params["password"] = password;
-				settings.addProject(*path);
+				settings.addProject(*path, std::move(params));
 				return true;
 			}
 		}
@@ -95,12 +98,55 @@ void WebClient::onAddFromURLLogin(const String& baseURL, const String& project, 
 
 std::optional<Path> WebClient::storeProjectData(const String& url, const String& project, const WebProjectData& data)
 {
-	// TODO
-	return {};
+	Hash::Hasher hasher;
+	hasher.feed(url);
+	const auto hash = hasher.digest();
+
+	String projectId = project + "-" + toString(hash, 16);
+	Path basePath = projectsFolder / projectId;
+
+	for (const auto& file: data.files) {
+		const auto path = basePath / file.first;
+		//OS::get().createDirectories(path.parentPath());
+		std::error_code ec;
+		std::filesystem::create_directories(path.parentPath().getString().cppStr(), ec);
+		bool ok = Path::writeFile(path, file.second);
+		if (!ok) {
+			Logger::logError("Could not write " + toString(file.second.size()) + " bytes to " + path.getNativeString(false));
+			return std::nullopt;
+		}
+	}
+
+	return basePath;
 }
 
 WebProjectData::WebProjectData(const ConfigNode& node)
 {
-	properties = Encode::decodeBase64(node["properties"].asString(""));
-	icon = Encode::decodeBase64(node["icon"].asString(""));
+	if (node.hasKey("files")) {
+		for (const auto& fileNode: node["files"].asSequence()) {
+			const auto path = fileNode["path"].asString("");
+			const auto bytes = Encode::decodeBase64(fileNode["bytes"].asString(""));
+			if (!path.isEmpty() && !bytes.empty() && !path.contains("..")) {
+				files.emplace_back(path, bytes);
+			}
+		}
+	}
+}
+
+Future<Bytes> WebClient::downloadEditor(HalleyVersion version, std::function<bool(uint64_t, uint64_t)> callback)
+{
+	auto request = webAPI.makeHTTPRequest(HTTPMethod::GET, "https://update.halley.io/halley-editor-bins/halley-editor-" + version.toString() + ".zip");
+
+	if (callback) {
+		request->setProgressCallback(std::move(callback));
+	}
+
+	return request->send().then([] (std::unique_ptr<HTTPResponse> response) -> Bytes
+	{
+		if (response->getResponseCode() == 200) {
+			return response->getBody();
+		} else {
+			return {};
+		}
+	});
 }

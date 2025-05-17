@@ -9,17 +9,13 @@ LaunchProject::LaunchProject(UIFactory& factory, LauncherSettings& settings, ILa
 	, factory(factory)
 	, settings(settings)
 	, parent(parent)
-	, project(std::move(project))
+	, projectLocation(std::move(project))
 	, safeMode(safeMode)
 {
-	const auto properties = LauncherProjectProperties::getProjectProperties(this->project);
-	if (!properties) {
-		parent.switchTo("choose_project");
-	} else if (properties->builtVersion != properties->halleyVersion) {
-		factory.loadUI(*this, "launcher/launch_project");
-		buildProject(properties->builtVersion < properties->cleanBuildIfOlderVersion);
+	if (this->projectLocation.params.hasKey("url")) {
+		checkForProjectUpdates();
 	} else {
-		launchProject();
+		tryLaunching();
 	}
 }
 
@@ -39,8 +35,33 @@ void LaunchProject::onMakeUI()
 	});
 }
 
+void LaunchProject::loadUIIfNeeded()
+{
+	if (!hasUI) {
+		factory.loadUI(*this, "launcher/launch_project");
+	}
+}
+
+void LaunchProject::tryLaunching()
+{
+	const auto properties = LauncherProjectProperties::getProjectProperties(projectLocation);
+	if (!properties) {
+		parent.switchTo("choose_project");
+	} else if (properties->builtVersion != properties->halleyVersion) {
+		if (projectLocation.params.hasKey("url")) {
+			downloadEditor(properties->halleyVersion);
+		} else {
+			buildProject(properties->builtVersion < properties->cleanBuildIfOlderVersion);
+		}
+	} else {
+		launchProject();
+	}
+}
+
 void LaunchProject::buildProject(bool clean)
 {
+	loadUIIfNeeded();
+
 	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Building..."));
 
 	const String scriptName = [] ()
@@ -51,10 +72,10 @@ void LaunchProject::buildProject(bool clean)
 			throw Exception("No project build script available for this platform.", HalleyExceptions::Tools);
 		}
 	}();
-	const auto buildScript = Path(project.path) / "halley" / "scripts" / scriptName;
+	const auto buildScript = Path(projectLocation.path) / "halley" / "scripts" / scriptName;
 	const auto command = "\"" + buildScript.getNativeString() + "\"" + (clean ? " --clean" : "");
 
-	runningCommand = OS::get().runCommandAsync(command, project.path.getNativeString(false), this);
+	runningCommand = OS::get().runCommandAsync(command, projectLocation.path.getNativeString(false), this);
 	runningCommand.then(Executors::getMainUpdateThread(), [=] (int returnValue)
 	{
 		if (returnValue == 0) {
@@ -68,27 +89,68 @@ void LaunchProject::buildProject(bool clean)
 	});
 }
 
+void LaunchProject::downloadEditor(HalleyVersion version)
+{
+	loadUIIfNeeded();
+	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Downloading editor..."));
+
+	parent.getWebClient().downloadEditor(version).then(aliveFlag, Executors::getMainUpdateThread(), [=](Bytes bytes)
+	{
+		if (bytes.empty()) {
+			log(LoggerLevel::Error, "Unable to download Halley Editor version " + version.toString());
+		} else {
+			log(LoggerLevel::Info, "Download successful");
+			if (installEditor(bytes)) {
+				launchProject();
+			}
+		}
+	});
+}
+
+bool LaunchProject::installEditor(Bytes data)
+{
+	auto path = projectLocation.path;
+	// TODO
+	return false;
+}
+
 void LaunchProject::launchProject()
 {
 	if (hasUI) {
 		getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
 	}
 
-	const auto dir = Path(project.path) / "halley" / "bin";
+	const auto dir = Path(projectLocation.path) / "halley" / "bin";
 	const auto cmd = dir / "halley-editor.exe";
-	const auto params = "--project \"" + project.path
+	const auto params = "--project \"" + projectLocation.path
 		+ "\" --launcher \"" + (parent.getHalleyAPI().core->getEnvironment().getProgramPath() / "halley-launcher.exe").getNativeString() + "\""
 		+ (safeMode ? " --dont-load-dll" : "");
 
 	if (Path::exists(cmd) && OS::get().runCommandDetached(cmd.getNativeString() + " " + params, dir.getNativeString(false))) {
 		parent.getHalleyAPI().core->quit(0);
 	} else {
-		if (!hasUI) {
-			factory.loadUI(*this, "launcher/launch_project");
-			getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
-		}
+		loadUIIfNeeded();
+		getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
 		log(LoggerLevel::Error, "Editor not found at " + cmd.getNativeString());
 	}
+}
+
+void LaunchProject::checkForProjectUpdates()
+{
+	loadUIIfNeeded();
+	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Checking for updates..."));
+
+	const auto url = projectLocation.params["url"].asString("");
+	const auto project = projectLocation.params["project"].asString("");
+	const auto username = projectLocation.params["username"].asString("");
+	const auto password = projectLocation.params["password"].asString("");
+	parent.getWebClient().updateProjectData(url, project, username, password).then(aliveFlag, Executors::getMainUpdateThread(), [=] (bool ok)
+	{
+		if (!ok) {
+			log(LoggerLevel::Warning, "Failed to update project.");
+		}
+		tryLaunching();
+	});
 }
 
 void LaunchProject::log(LoggerLevel level, std::string_view msg)
