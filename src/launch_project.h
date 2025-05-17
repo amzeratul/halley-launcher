@@ -14,6 +14,7 @@ namespace Halley {
     	LaunchProject(UIFactory& factory, LauncherSettings& settings, ILauncher& parent, ProjectLocation project, bool safeMode);
 
         void onMakeUI() override;
+        void update(Time t, bool moved) override;
         
 	protected:
         void log(LoggerLevel level, std::string_view msg) override;
@@ -29,14 +30,18 @@ namespace Halley {
         Future<int> runningCommand;
         bool hasUI = false;
 
+        std::mutex progressMutex;
+		std::optional<std::pair<uint64_t, uint64_t>> pendingProgress;
+
         void loadUIIfNeeded();
         void tryLaunching();
-        HalleyVersion getBuiltVersion(const Path& path) const;
         void buildProject(bool clean);
         void downloadEditor(HalleyVersion version);
         void installEditor(Bytes data);
         bool doInstallEditor(Bytes data, const Path& path);
         void launchProject();
+
+        void setProgress(uint64_t progress, uint64_t total);
 
         void checkForProjectUpdates();
     };

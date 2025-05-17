@@ -1,5 +1,7 @@
 #include "launcher_settings.h"
 
+#include <filesystem>
+
 ProjectLocation::ProjectLocation(Path path, ConfigNode params)
 	: path(std::move(path))
 	, params(std::move(params))
@@ -102,8 +104,17 @@ bool LauncherSettings::addOrUpdateProject(Path path, ConfigNode params)
 
 bool LauncherSettings::removeProject(const Path& path)
 {
-	if (std_ex::contains(projects, path)) {
-		std_ex::erase(projects, path);
+	const auto iter = std_ex::find(projects, path);
+	if (iter != projects.end()) {
+		if (iter->params.hasKey("url")) {
+			std::error_code ec;
+			std::filesystem::remove_all(iter->path.getString().cppStr(), ec);
+			if (ec) {
+				return false;
+			}
+		}
+
+		projects.erase(iter);
 		dirty = true;
 		return true;
 	}

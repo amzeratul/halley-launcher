@@ -37,6 +37,24 @@ void LaunchProject::onMakeUI()
 	});
 }
 
+void LaunchProject::update(Time t, bool moved)
+{
+	if (hasUI) {
+		decltype(pendingProgress) prog;
+		{
+			auto lock = std::unique_lock(progressMutex);
+			prog = pendingProgress;
+		}
+
+		getWidget("progress_bg")->setActive(prog->second > 0);
+		if (prog->second > 0) {
+			const auto size = getWidgetAs<UIImage>("progress_bg")->getSize();
+			const float t = float(prog->first) / static_cast<float>(prog->second);
+			getWidgetAs<UIImage>("progress")->getSprite().scaleTo(Vector2f::max(size * Vector2f(t, 1.0f), Vector2f(10.0f, 0.0f)));
+		}
+	}
+}
+
 void LaunchProject::loadUIIfNeeded()
 {
 	if (!hasUI) {
@@ -46,6 +64,8 @@ void LaunchProject::loadUIIfNeeded()
 
 void LaunchProject::tryLaunching()
 {
+	setProgress(0, 0);
+
 	const auto properties = LauncherProjectProperties::getProjectProperties(projectLocation);
 	if (!properties) {
 		parent.switchTo("choose_project");
@@ -96,7 +116,16 @@ void LaunchProject::downloadEditor(HalleyVersion version)
 	loadUIIfNeeded();
 	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Downloading editor..."));
 
-	parent.getWebClient().downloadEditor(version).then(aliveFlag, Executors::getMainUpdateThread(), [=](Bytes bytes)
+	setProgress(0, 1);
+	parent.getWebClient().downloadEditor(version, [=, flag = NonOwningAliveFlag(aliveFlag)] (uint64_t cur, uint64_t total) -> bool
+	{
+		if (flag) {
+			setProgress(cur, total);
+			return true;
+		} else {
+			return false;
+		}
+	}).then(aliveFlag, Executors::getMainUpdateThread(), [=](Bytes bytes)
 	{
 		if (bytes.empty()) {
 			log(LoggerLevel::Error, "Unable to download Halley Editor version " + version.toString());
@@ -109,6 +138,7 @@ void LaunchProject::downloadEditor(HalleyVersion version)
 
 void LaunchProject::installEditor(Bytes data)
 {
+	getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Installing editor..."));
 	Concurrent::execute([this, data = std::move(data), path = projectLocation.path] () mutable -> bool
 	{
 		return doInstallEditor(std::move(data), path);
@@ -134,9 +164,16 @@ bool LaunchProject::doInstallEditor(Bytes bytes, const Path& projectPath)
 		return false;
 	}
 
-	const auto rootPath = projectPath / "halley";
+	const auto rootPath = projectPath;
 
 	const auto n = zip.getNumFiles();
+	uint64_t totalSize = 0;
+	for (size_t i = 0; i < n; ++i) {
+		totalSize += zip.getFileSize(i);
+	}
+	setProgress(0, totalSize);
+
+	uint64_t totalExtracted = 0;
 	for (size_t i = 0; i < n; ++i) {
 		const auto name = zip.getFileName(i);
 		auto fileBytes = zip.extractFile(i);
@@ -147,7 +184,14 @@ bool LaunchProject::doInstallEditor(Bytes bytes, const Path& projectPath)
 			std::filesystem::create_directories(parentPath, ec);
 			const bool ok = Path::writeFile(path, fileBytes);
 
-			if (!ok) {
+			if (ok) {
+				totalExtracted += zip.getFileSize(i);
+				setProgress(totalExtracted, totalSize);
+			} else {
+				Concurrent::execute(Executors::getMainUpdateThread(), [this, name]()
+				{
+					log(LoggerLevel::Error, "Unable to extract file from zip: " + name);
+				});
 				return false;
 			}
 		}
@@ -158,6 +202,8 @@ bool LaunchProject::doInstallEditor(Bytes bytes, const Path& projectPath)
 
 void LaunchProject::launchProject()
 {
+	setProgress(0, 0);
+
 	if (hasUI) {
 		getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
 	}
@@ -175,6 +221,12 @@ void LaunchProject::launchProject()
 		getWidgetAs<UILabel>("status")->setText(LocalisedString::fromHardcodedString("Launching..."));
 		log(LoggerLevel::Error, "Editor not found at " + cmd.getNativeString());
 	}
+}
+
+void LaunchProject::setProgress(uint64_t progress, uint64_t total)
+{
+	auto lock = std::unique_lock(progressMutex);
+	pendingProgress = { progress, total };
 }
 
 void LaunchProject::checkForProjectUpdates()

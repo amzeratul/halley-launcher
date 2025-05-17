@@ -12,22 +12,25 @@ children:
       class: label
       id: status
       text: Launching...
-  - uuid: 98d3b878-0fd0-4ebc-84a6-22f6a982736b
+  - uuid: e60108ae-cda6-4059-85e2-dae6d8ab7f98
     sizer:
       columnProportions: []
     widget:
-      active: false
+      active: true
       class: image
+      colour: "#00000080"
       id: progress_bg
       image: halley_ui/ui_list_item.png
+      size: [500, 0]
     children:
-      - uuid: caabf236-8e14-4dc5-842d-8975e9b3b821
+      - uuid: 1309d87c-1198-41a6-a76a-6324636bef50
         sizer:
           columnProportions: []
         widget:
           class: image
           id: progress
           image: halley_ui/ui_list_item.png
+          size: [1, 15]
   - uuid: e2985f93-d290-481c-bbce-a202d02aa264
     proportion: 1
     sizer:

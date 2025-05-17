@@ -25,7 +25,7 @@ children:
           class: label
           id: statusMessage
           maxWidth: 500
-          text: Status message
+          text: Where do you want to source the project from?
           wordWrapped: true
         fill: [fillHorizontal, centreVertical]
   - uuid: 6e3f2335-264d-4d4b-a687-e8042677d2a6
