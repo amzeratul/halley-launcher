@@ -106,5 +106,6 @@ void LauncherSettings::bumpProject(const Path& path)
 		auto project = std::move(*iter);
 		projects.erase(iter);
 		projects.insert(projects.begin(), std::move(project));
+		dirty = true;
 	}
 }
