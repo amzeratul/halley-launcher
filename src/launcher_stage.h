@@ -4,6 +4,9 @@
 
 #include "launcher_save_data.h"
 #include "new_version_info.h"
+#include "web_client.h"
+
+class LauncherSettings;
 
 namespace Halley {
 	class ILauncher {
@@ -14,6 +17,8 @@ namespace Halley {
 		virtual const HalleyAPI& getHalleyAPI() const = 0;
 		virtual std::optional<NewVersionInfo> getNewVersionInfo() const = 0;
 		virtual void exit() = 0;
+		virtual WebClient& getWebClient() = 0;
+		virtual LauncherSettings& getSettings() = 0;
 	};
 
 	class LauncherStage : public Stage, public ILauncher {
@@ -32,6 +37,9 @@ namespace Halley {
 		std::optional<NewVersionInfo> getNewVersionInfo() const override;
 		void exit() override;
 
+		WebClient& getWebClient() override;
+		LauncherSettings& getSettings() override;
+
 	private:
 		std::optional<String> initialProject;
 		I18N i18n;
@@ -39,6 +47,8 @@ namespace Halley {
 		std::unique_ptr<UIRoot> ui;
 		std::shared_ptr<UIWidget> topLevelUI;
 		std::shared_ptr<UIWidget> curUI;
+
+		std::unique_ptr<WebClient> webClient;
 
 		Executor mainThreadExecutor;
 

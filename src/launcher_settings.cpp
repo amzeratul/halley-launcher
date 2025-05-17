@@ -1,8 +1,8 @@
 #include "launcher_settings.h"
 
-ProjectLocation::ProjectLocation(Path path, std::optional<String> url)
+ProjectLocation::ProjectLocation(Path path, ConfigNode params)
 	: path(std::move(path))
-	, url(std::move(url))
+	, params(std::move(params))
 {
 }
 
@@ -12,7 +12,7 @@ ProjectLocation::ProjectLocation(const ConfigNode& node)
 		path = Path(node.asString());
 	} else {
 		path = node["path"].asString("");
-		url = node["url"].asOptional<String>();
+		params = ConfigNode(node["params"]);
 	}
 }
 
@@ -20,7 +20,7 @@ ConfigNode ProjectLocation::toConfigNode() const
 {
 	ConfigNode::MapType result;
 	result["path"] = path.toString();
-	result["url"] = url;
+	result["params"] = ConfigNode(params);
 	return result;
 }
 
@@ -79,14 +79,25 @@ const ProjectLocation* LauncherSettings::tryGetProject(const Path& path) const
 	return nullptr;
 }
 
-bool LauncherSettings::addProject(Path path, std::optional<String> url)
+bool LauncherSettings::addProject(Path path, ConfigNode params)
 {
 	if (!std_ex::contains(projects, path)) {
-		projects.insert(projects.begin(), path);
+		projects.insert(projects.begin(), ProjectLocation(std::move(path), std::move(params)));
 		dirty = true;
 		return true;
 	}
 	return false;
+}
+
+bool LauncherSettings::addOrUpdateProject(Path path, ConfigNode params)
+{
+	const auto iter = std_ex::find(projects, path);
+	if (iter != projects.end()) {
+		iter->params = std::move(params);
+		return true;
+	} else {
+		return addProject(std::move(path), std::move(params));
+	}
 }
 
 bool LauncherSettings::removeProject(const Path& path)

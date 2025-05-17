@@ -29,14 +29,20 @@ private:
 
 	Page page = Page::Main;
 
+	AliveFlag aliveFlag;
+
 	void onNewProject();
 	void onAddFromDisk();
 	void onAddFromURL();
 	void addNewProject(const ProjectLocation& project);
 
+	void showError(const String& errorMessage);
 	void showError(LocalisedString errorMessage);
 	void setError(LocalisedString errorMessage);
 	void close();
+	void cancel();
 
 	void setPage(Page page);
+	bool canAddFromURL();
+	void setURLPageEnabled(bool enabled);
 };

@@ -18,5 +18,7 @@ src/new_version_info.cpp
 src/new_version_info.h
 src/update.cpp
 src/update.h
+src/web_client.cpp
+src/web_client.h
 prec.h
 prec.cpp

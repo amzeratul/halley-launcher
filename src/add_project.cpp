@@ -41,7 +41,7 @@ void AddProject::onMakeUI()
 		if (page == Page::Main) {
 			close();
 		} else {
-			setPage(Page::Main);
+			cancel();
 		}
 	});
 
@@ -65,11 +65,6 @@ void AddProject::onAddFromDisk()
 	});
 }
 
-void AddProject::onAddFromURL()
-{
-	// TODO
-}
-
 void AddProject::addNewProject(const ProjectLocation& project)
 {
 	if (const auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), parent.getHalleyAPI().video)) {
@@ -81,6 +76,11 @@ void AddProject::addNewProject(const ProjectLocation& project)
 	} else {
 		showError(LocalisedString::fromHardcodedString("Error: Unable to add project."));
 	}
+}
+
+void AddProject::showError(const String& errorMessage)
+{
+	return setError(LocalisedString::fromUserString(errorMessage));
 }
 
 void AddProject::showError(LocalisedString errorMessage)
@@ -101,10 +101,67 @@ void AddProject::close()
 	parent.switchTo(std::make_shared<ChooseProject>(factory, settings, parent));
 }
 
+void AddProject::cancel()
+{
+	setPage(Page::Main);
+}
+
 void AddProject::setPage(Page page)
 {
 	this->page = page;
 
 	getWidget("mainPage")->setActive(page == Page::Main);
 	getWidget("addURLPage")->setActive(page == Page::OpenURL);
+
+	if (page == Page::OpenURL) {
+		setURLPageEnabled(true);
+	}
+}
+
+bool AddProject::canAddFromURL()
+{
+	auto url = getWidgetAs<UITextInput>("url");
+	auto project = getWidgetAs<UITextInput>("project");
+	auto username = getWidgetAs<UITextInput>("username");
+	auto password = getWidgetAs<UITextInput>("password");
+
+	return url->getText().startsWith("http") && !project->getText().isEmpty() && !username->getText().isEmpty() && !password->getText().isEmpty();
+}
+
+void AddProject::setURLPageEnabled(bool enabled)
+{
+	auto url = getWidget("url");
+	auto project = getWidget("project");
+	auto username = getWidget("username");
+	auto password = getWidget("password");
+
+	url->setEnabled(enabled);
+	project->setEnabled(enabled);
+	username->setEnabled(enabled);
+	password->setEnabled(enabled);
+
+	getWidget("addFromURL")->setEnabled(enabled && canAddFromURL());
+}
+
+void AddProject::onAddFromURL()
+{
+	if (!canAddFromURL()) {
+		return;
+	}
+	setURLPageEnabled(false);
+
+	auto url = getWidgetAs<UITextInput>("url")->getText();
+	auto project = getWidgetAs<UITextInput>("project")->getText();
+	auto username = getWidgetAs<UITextInput>("username")->getText();
+	auto password = getWidgetAs<UITextInput>("password")->getText();
+
+	parent.getWebClient().updateProjectData(url, project, username, password).then(aliveFlag, Executors::getMainUpdateThread(), [=](bool ok)
+	{
+		if (ok) {
+			close();
+		} else {
+			showError("Unable to retrieve project data from web.");
+			setURLPageEnabled(true);
+		}
+	});
 }

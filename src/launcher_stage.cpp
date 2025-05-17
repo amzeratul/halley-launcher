@@ -15,6 +15,7 @@ LauncherStage::LauncherStage(std::optional<String> initialProject)
 
 void LauncherStage::init()
 {
+	webClient = std::make_unique<WebClient>(getWebAPI(), getSettings());
 	saveData = std::make_shared<LauncherSaveData>(getSystemAPI().getStorageContainer(SaveDataType::SaveLocal));
 	
 	makeUI();
@@ -43,7 +44,7 @@ void LauncherStage::onVariableUpdate(Time time)
 
 	updateUI(time);
 
-	auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+	auto& settings = getSettings();
 	if (settings.isDirty()) {
 		settings.saveToFile(getSystemAPI());
 	}
@@ -102,6 +103,16 @@ void LauncherStage::exit()
 	getCoreAPI().quit(0);
 }
 
+WebClient& LauncherStage::getWebClient()
+{
+	return *webClient;
+}
+
+LauncherSettings& LauncherStage::getSettings()
+{
+	return dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
+}
+
 void LauncherStage::makeSprites()
 {
 	auto mat = std::make_shared<Material>(getResource<MaterialDefinition>("Launcher/Background"));
@@ -126,8 +137,7 @@ void LauncherStage::makeUI()
 	getVideoAPI().getWindow().setTitleColour(bgCol, bgCol);
 
 	if (initialProject) {
-		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
-		switchTo(std::make_shared<LaunchProject>(*uiFactory, settings, *this, Path(*initialProject), false));
+		switchTo(std::make_shared<LaunchProject>(*uiFactory, getSettings(), *this, Path(*initialProject), false));
 	} else {
 		switchTo("choose_project");
 	}

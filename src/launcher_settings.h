@@ -6,10 +6,10 @@ using namespace Halley;
 class ProjectLocation {
 public:
 	Path path;
-	std::optional<String> url;
+	ConfigNode params;
 
 	ProjectLocation() = default;
-	ProjectLocation(Path path, std::optional<String> url = std::nullopt);
+	ProjectLocation(Path path, ConfigNode params = {});
 	ProjectLocation(const ConfigNode& node);
 
 	ConfigNode toConfigNode() const;
@@ -30,7 +30,8 @@ public:
 	gsl::span<const ProjectLocation> getProjects() const;
 	const ProjectLocation* tryGetProject(const Path& path) const;
 
-	bool addProject(Path path, std::optional<String> url = std::nullopt);
+	bool addProject(Path path, ConfigNode params = {});
+	bool addOrUpdateProject(Path path, ConfigNode params = {});
 	bool removeProject(const Path& path);
 	void bumpProject(const Path& path);
 

@@ -64,6 +64,7 @@ children:
       type: vertical
     widget:
       class: widget
+      enabled: true
       id: addURLPage
       size: [500, 0]
     children:
@@ -77,6 +78,7 @@ children:
           type: grid
         widget:
           class: widget
+          enabled: true
           size: [250, 0]
         children:
           - uuid: a90bc3c2-3cb3-4dff-97c4-9cc400bd9a39
@@ -102,6 +104,7 @@ children:
             widget:
               class: textInput
               id: project
+              maxLength: 128
               size: [0, 0]
           - uuid: 23bcfaa3-5994-45ce-85f6-928c8e52141d
             border: [0, 0, 4, 0]
@@ -114,6 +117,7 @@ children:
             widget:
               class: textInput
               id: username
+              maxLength: 128
           - uuid: b2eb8420-bd92-4796-8e24-fa289615db56
             border: [0, 0, 4, 0]
             widget:
@@ -125,6 +129,7 @@ children:
             widget:
               class: textInput
               id: password
+              maxLength: 128
               password: true
       - uuid: d08cee39-9d28-4b83-a48a-959379175ee5
         border: [0, 10, 0, 0]
