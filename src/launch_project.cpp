@@ -1,5 +1,7 @@
 #include "launch_project.h"
 
+#include <filesystem>
+
 #include "launcher_stage.h"
 #include "launcher_project_properties.h"
 using namespace Halley;
@@ -100,18 +102,58 @@ void LaunchProject::downloadEditor(HalleyVersion version)
 			log(LoggerLevel::Error, "Unable to download Halley Editor version " + version.toString());
 		} else {
 			log(LoggerLevel::Info, "Download successful");
-			if (installEditor(bytes)) {
-				launchProject();
-			}
+			installEditor(bytes);
 		}
 	});
 }
 
-bool LaunchProject::installEditor(Bytes data)
+void LaunchProject::installEditor(Bytes data)
 {
-	auto path = projectLocation.path;
-	// TODO
-	return false;
+	Concurrent::execute([this, data = std::move(data), path = projectLocation.path] () mutable -> bool
+	{
+		return doInstallEditor(std::move(data), path);
+	}).then(aliveFlag, Executors::getMainUpdateThread(), [=] (bool ok)
+	{
+		if (ok) {
+			launchProject();
+		} else {
+			log(LoggerLevel::Error, "Unable to extract Halley Editor - make sure it's not already running.");
+		}
+	});
+}
+
+bool LaunchProject::doInstallEditor(Bytes bytes, const Path& projectPath)
+{
+	ZipFile zip;
+	bool success = zip.open(std::move(bytes));
+	if (!success) {
+		Concurrent::execute(Executors::getMainUpdateThread(), [this]()
+		{
+			log(LoggerLevel::Error, "Unable to parse zip file.");
+		});
+		return false;
+	}
+
+	const auto rootPath = projectPath / "halley";
+
+	const auto n = zip.getNumFiles();
+	for (size_t i = 0; i < n; ++i) {
+		const auto name = zip.getFileName(i);
+		auto fileBytes = zip.extractFile(i);
+		if (!fileBytes.empty()) {
+			const auto path = rootPath / name;
+			const auto parentPath = path.parentPath().getString().cppStr();
+			std::error_code ec;
+			std::filesystem::create_directories(parentPath, ec);
+			const bool ok = Path::writeFile(path, fileBytes);
+
+			if (!ok) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 void LaunchProject::launchProject()

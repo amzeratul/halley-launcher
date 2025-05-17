@@ -34,7 +34,8 @@ namespace Halley {
         HalleyVersion getBuiltVersion(const Path& path) const;
         void buildProject(bool clean);
         void downloadEditor(HalleyVersion version);
-        bool installEditor(Bytes data);
+        void installEditor(Bytes data);
+        bool doInstallEditor(Bytes data, const Path& path);
         void launchProject();
 
         void checkForProjectUpdates();
