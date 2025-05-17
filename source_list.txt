@@ -1,3 +1,5 @@
+src/add_project.cpp
+src/add_project.h
 src/choose_project.cpp
 src/choose_project.h
 src/launch_project.cpp

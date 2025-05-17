@@ -6,14 +6,38 @@ sizer:
 widget:
   class: widget
 children:
+  - uuid: 08eadf68-e23a-4782-a789-467865482ec5
+    proportion: 0
+    sizer:
+      columnProportions: []
+      type: vertical
+    widget:
+      class: image
+      colour: "#00000080"
+      id: log
+      image: whitebox.png
+      innerBorder: [5, 5, 5, 5]
+    children:
+      - uuid: 5ce18888-39de-4814-976e-102b53071a75
+        border: [0, 0, 4, 0]
+        widget:
+          active: true
+          class: label
+          id: statusMessage
+          maxWidth: 500
+          text: Status message
+          wordWrapped: true
+        fill: [fillHorizontal, centreVertical]
   - uuid: 6e3f2335-264d-4d4b-a687-e8042677d2a6
+    proportion: 1
     sizer:
       columnProportions: []
       gap: 4
       type: vertical
     widget:
       class: widget
-      id: addTypePage
+      id: mainPage
+      size: [500, 0]
     children:
       - uuid: 27ffb468-f4e9-44e8-bc01-6147b4235266
         widget:
@@ -29,9 +53,11 @@ children:
       - uuid: 26e50c07-9bf3-42b2-9424-0827d502dd6d
         widget:
           class: button
-          id: addURL
+          id: addURLStart
           text: Open from URL...
+    fill: [fillHorizontal, centreVertical]
   - uuid: 0daef1dc-dca6-4d13-84c5-8ed651af1e69
+    proportion: 1
     sizer:
       columnProportions: []
       gap: 4
@@ -39,6 +65,7 @@ children:
     widget:
       class: widget
       id: addURLPage
+      size: [500, 0]
     children:
       - uuid: 5d53c4ca-1eb2-480d-9f9e-228f69ae0972
         sizer:
@@ -46,9 +73,11 @@ children:
             - ~
             - 1
           columns: 2
+          gap: 4
           type: grid
         widget:
           class: widget
+          size: [250, 0]
         children:
           - uuid: a90bc3c2-3cb3-4dff-97c4-9cc400bd9a39
             border: [0, 0, 4, 0]
@@ -61,11 +90,49 @@ children:
             widget:
               class: textInput
               id: url
+              size: [0, 0]
+          - uuid: 90c71e80-feb3-47e1-95bc-f96c3d2eb3f6
+            border: [0, 0, 4, 0]
+            widget:
+              class: label
+              text: "Project:"
+            fill: [fillHorizontal, centreVertical]
+          - uuid: b29f67ed-fbeb-4314-808c-98d266c9a038
+            border: [0, 0, 0, 0]
+            widget:
+              class: textInput
+              id: project
+              size: [0, 0]
+          - uuid: 23bcfaa3-5994-45ce-85f6-928c8e52141d
+            border: [0, 0, 4, 0]
+            widget:
+              class: label
+              text: "Username: "
+            fill: [fillHorizontal, centreVertical]
+          - uuid: 5f216553-ccd2-43fc-a869-442966ac600e
+            border: [0, 0, 0, 0]
+            widget:
+              class: textInput
+              id: username
+          - uuid: b2eb8420-bd92-4796-8e24-fa289615db56
+            border: [0, 0, 4, 0]
+            widget:
+              class: label
+              text: "Password: "
+            fill: [fillHorizontal, centreVertical]
+          - uuid: 3079d1b7-79f6-4940-973d-744d43b05f9d
+            border: [0, 0, 0, 0]
+            widget:
+              class: textInput
+              id: password
+              password: true
       - uuid: d08cee39-9d28-4b83-a48a-959379175ee5
+        border: [0, 10, 0, 0]
         widget:
           class: button
-          id: addURL2
+          id: addFromURL
           text: Open from URL
+    fill: [fillHorizontal, centreVertical]
   - uuid: 2db1c8fb-77b1-47d2-9d08-7b0852c2ca8b
     sizer:
       columnProportions: []

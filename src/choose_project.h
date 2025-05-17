@@ -10,25 +10,22 @@ namespace Halley {
 
 	class ChooseProject : public UIWidget {
     public:
-    	ChooseProject(UIFactory& factory, VideoAPI& videoAPI, LauncherSettings& settings, ILauncher& parent);
+    	ChooseProject(UIFactory& factory, LauncherSettings& settings, ILauncher& parent);
 
         void onMakeUI() override;
         void update(Time t, bool moved) override;
     	
     private:
     	UIFactory& factory;
-        VideoAPI& videoAPI;
         LauncherSettings& settings;
         ILauncher& parent;
         
-        void onNew();
         void onAdd();
         void onOpen(const String& path, bool safeMode = false);
         void onProjectSelected(const String& path);
         void onUpdateLauncher();
 
     	void loadPaths();
-    	void addNewProject(const ProjectLocation& project);
         void addPathToList(const LauncherProjectProperties& properties);
     };
 }

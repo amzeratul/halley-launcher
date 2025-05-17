@@ -1,14 +1,14 @@
 #include "choose_project.h"
 
+#include "add_project.h"
 #include "launcher_stage.h"
 #include "launch_project.h"
 #include "launcher_settings.h"
 using namespace Halley;
 
-ChooseProject::ChooseProject(UIFactory& factory, VideoAPI& videoAPI, LauncherSettings& settings, ILauncher& parent)
+ChooseProject::ChooseProject(UIFactory& factory, LauncherSettings& settings, ILauncher& parent)
 	: UIWidget("choose_project", {}, UISizer())
 	, factory(factory)
-	, videoAPI(videoAPI)
 	, settings(settings)
 	, parent(parent)
 {
@@ -34,11 +34,6 @@ void ChooseProject::onMakeUI()
 
 	onProjectSelected({});
 	
-	setHandle(UIEventType::ButtonClicked, "new", [=] (const UIEvent& event)
-	{
-		onNew();
-	});
-
 	setHandle(UIEventType::ButtonClicked, "add", [=] (const UIEvent& event)
 	{
 		onAdd();
@@ -46,15 +41,17 @@ void ChooseProject::onMakeUI()
 	
 	setHandle(UIEventType::ButtonClicked, "open", [=] (const UIEvent& event)
 	{
+		const auto id = getWidgetAs<UIList>("projects")->getSelectedOptionId();
 		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
-			onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId());
+			onOpen(id);
 		});
 	});
 	
 	setHandle(UIEventType::ButtonClicked, "openSafe", [=] (const UIEvent& event)
 	{
+		const auto id = getWidgetAs<UIList>("projects")->getSelectedOptionId();
 		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
-			onOpen(getWidgetAs<UIList>("projects")->getSelectedOptionId(), true);
+			onOpen(id, true);
 		});
 	});
 
@@ -67,15 +64,17 @@ void ChooseProject::onMakeUI()
 
 	setHandle(UIEventType::ListSelectionChanged, "projects", [=](const UIEvent& event)
 	{
+		const auto id = event.getStringData();
 		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
-			onProjectSelected(event.getStringData());
+			onProjectSelected(id);
 		});
 	});
 
 	setHandle(UIEventType::ListAccept, "projects", [=] (const UIEvent& event)
 	{
+		const auto id = event.getStringData();
 		Concurrent::execute(Executors::getMainUpdateThread(), [=]() {
-			onOpen(event.getStringData());
+			onOpen(id);
 		});
 	});
 
@@ -88,21 +87,9 @@ void ChooseProject::update(Time t, bool moved)
 	getWidget("updateLauncher")->setActive(newVersionInfo && newVersionInfo->isNewVersion());
 }
 
-void ChooseProject::onNew()
-{
-	// TODO
-}
-
 void ChooseProject::onAdd()
 {
-	FileChooserParameters parameters;
-	parameters.folderOnly = true;
-	OS::get().openFileChooser(parameters).then(Executors::getMainUpdateThread(), [=] (std::optional<Path> path)
-	{
-		if (path) {
-			addNewProject(ProjectLocation(path.value().getNativeString(false)));
-		}
-	});
+	parent.switchTo(std::make_shared<AddProject>(factory, settings, parent));
 }
 
 void ChooseProject::onOpen(const String& path, bool safeMode)
@@ -118,7 +105,7 @@ void ChooseProject::onProjectSelected(const String& path)
 	bool enabled = false;
 	bool safeEnabled = false;
 	if (const auto* project = settings.tryGetProject(path)) {
-		if (const auto properties = LauncherProjectProperties::getProjectProperties(*project, &factory.getResources(), &videoAPI)) {
+		if (const auto properties = LauncherProjectProperties::getProjectProperties(*project, &factory.getResources(), parent.getHalleyAPI().video)) {
 			enabled = true;
 			safeEnabled = properties->halleyVersion >= HalleyVersion{ 3, 3, 79 };
 		}
@@ -136,7 +123,7 @@ void ChooseProject::loadPaths()
 {
 	Vector<String> toRemove;
 	for (const auto& project: settings.getProjects()) {
-		if (auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), &videoAPI)) {
+		if (auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), parent.getHalleyAPI().video)) {
 			addPathToList(*properties);
 		} else {
 			toRemove.push_back(project.path);
@@ -144,18 +131,6 @@ void ChooseProject::loadPaths()
 	}
 	for (const auto& path: toRemove) {
 		settings.removeProject(path);
-	}
-}
-
-void ChooseProject::addNewProject(const ProjectLocation& project)
-{
-	if (const auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), &videoAPI)) {
-		const bool added = settings.addProject(project.path);
-		if (added) {
-			addPathToList(*properties);
-		}
-	} else {
-		// TODO: report error
 	}
 }
 

@@ -79,7 +79,7 @@ void LauncherStage::switchTo(const String& view)
 {
 	if (view == "choose_project") {
 		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
-		setCurrentUI(std::make_shared<ChooseProject>(*uiFactory, getVideoAPI(), settings, *this));
+		setCurrentUI(std::make_shared<ChooseProject>(*uiFactory, settings, *this));
 	} else if (view == "update") {
 		setCurrentUI(std::make_shared<Update>(*uiFactory, *this, *newVersionInfo));
 	} else {

@@ -101,6 +101,10 @@ bool LauncherSettings::removeProject(const String& path)
 
 void LauncherSettings::bumpProject(const String& path)
 {
-	removeProject(path);
-	addProject(path);
+	const auto iter = std_ex::find(projects, path);
+	if (iter != projects.end() && iter != projects.begin()) {
+		auto project = std::move(*iter);
+		projects.erase(iter);
+		projects.insert(projects.begin(), std::move(project));
+	}
 }
