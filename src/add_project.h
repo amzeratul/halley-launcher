@@ -16,6 +16,7 @@ public:
 	AddProject(UIFactory& factory, LauncherSettings& settings, ILauncher& parent);
 
 	void onMakeUI() override;
+	void update(Time t, bool moved) override;
 
 private:
 	enum class Page {
@@ -28,6 +29,7 @@ private:
 	ILauncher& parent;
 
 	Page page = Page::Main;
+	bool urlPageEnabled = true;
 
 	AliveFlag aliveFlag;
 

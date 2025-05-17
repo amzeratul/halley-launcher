@@ -123,11 +123,11 @@ void ChooseProject::onUpdateLauncher()
 void ChooseProject::loadPaths()
 {
 	Vector<Path> toRemove;
-	for (const auto& project: settings.getProjects()) {
-		if (auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), parent.getHalleyAPI().video)) {
-			addPathToList(*properties);
+	for (const auto& projectLocation: settings.getProjects()) {
+		if (auto properties = LauncherProjectProperties::getProjectProperties(projectLocation, &factory.getResources(), parent.getHalleyAPI().video)) {
+			addPathToList(projectLocation, *properties);
 		} else {
-			toRemove.push_back(project.path);
+			toRemove.push_back(projectLocation.path);
 		}
 	}
 	for (const auto& path: toRemove) {
@@ -135,15 +135,17 @@ void ChooseProject::loadPaths()
 	}
 }
 
-void ChooseProject::addPathToList(const LauncherProjectProperties& properties)
+void ChooseProject::addPathToList(const ProjectLocation& projectLocation, const LauncherProjectProperties& properties)
 {
 	const auto list = getWidgetAs<UIList>("projects");
 
 	const auto id = properties.path.getString();
 
+	auto pathToShow = projectLocation.params["url"].asString(properties.path.getNativeString(false));
+
 	auto entry = factory.makeUI("launcher/project_entry");
 	entry->getWidgetAs<UILabel>("project_name")->setText(LocalisedString::fromUserString(properties.name));
-	entry->getWidgetAs<UILabel>("project_path")->setText(LocalisedString::fromUserString(properties.path.getNativeString(false)));
+	entry->getWidgetAs<UILabel>("project_path")->setText(LocalisedString::fromUserString(pathToShow));
 	entry->getWidgetAs<UILabel>("halley_version")->setText(LocalisedString::fromUserString("Halley v" + properties.halleyVersion.toString()));
 
 	if (properties.icon.hasMaterial()) {

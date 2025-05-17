@@ -48,6 +48,13 @@ void AddProject::onMakeUI()
 	setPage(Page::Main);
 }
 
+void AddProject::update(Time t, bool moved)
+{
+	if (page == Page::OpenURL) {
+		getWidget("addFromURL")->setEnabled(urlPageEnabled && canAddFromURL());
+	}
+}
+
 void AddProject::onNewProject()
 {
 	// TODO
@@ -130,6 +137,8 @@ bool AddProject::canAddFromURL()
 
 void AddProject::setURLPageEnabled(bool enabled)
 {
+	urlPageEnabled = enabled;
+
 	auto url = getWidget("url");
 	auto project = getWidget("project");
 	auto username = getWidget("username");

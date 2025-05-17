@@ -26,6 +26,6 @@ namespace Halley {
         void onUpdateLauncher();
 
     	void loadPaths();
-        void addPathToList(const LauncherProjectProperties& properties);
+        void addPathToList(const ProjectLocation& projectLocation, const LauncherProjectProperties& properties);
     };
 }
