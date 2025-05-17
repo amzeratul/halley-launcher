@@ -127,7 +127,7 @@ void LauncherStage::makeUI()
 
 	if (initialProject) {
 		auto& settings = dynamic_cast<HalleyLauncher&>(getGame()).getSettings();
-		switchTo(std::make_shared<LaunchProject>(*uiFactory, settings, *this, *initialProject, false));
+		switchTo(std::make_shared<LaunchProject>(*uiFactory, settings, *this, Path(*initialProject), false));
 	} else {
 		switchTo("choose_project");
 	}

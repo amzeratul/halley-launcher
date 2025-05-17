@@ -95,8 +95,9 @@ void ChooseProject::onAdd()
 void ChooseProject::onOpen(const String& path, bool safeMode)
 {
 	if (const auto* project = settings.tryGetProject(path)) {
-		settings.bumpProject(path);
-		parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, *project, safeMode));
+		auto projectLocation = *project;
+		settings.bumpProject(path); // This invalidates project!
+		parent.switchTo(std::make_shared<LaunchProject>(factory, settings, parent, projectLocation, safeMode));
 	}
 }
 
@@ -121,7 +122,7 @@ void ChooseProject::onUpdateLauncher()
 
 void ChooseProject::loadPaths()
 {
-	Vector<String> toRemove;
+	Vector<Path> toRemove;
 	for (const auto& project: settings.getProjects()) {
 		if (auto properties = LauncherProjectProperties::getProjectProperties(project, &factory.getResources(), parent.getHalleyAPI().video)) {
 			addPathToList(*properties);

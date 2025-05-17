@@ -54,7 +54,7 @@ void LaunchProject::buildProject(bool clean)
 	const auto buildScript = Path(project.path) / "halley" / "scripts" / scriptName;
 	const auto command = "\"" + buildScript.getNativeString() + "\"" + (clean ? " --clean" : "");
 
-	runningCommand = OS::get().runCommandAsync(command, project.path, this);
+	runningCommand = OS::get().runCommandAsync(command, project.path.getNativeString(false), this);
 	runningCommand.then(Executors::getMainUpdateThread(), [=] (int returnValue)
 	{
 		if (returnValue == 0) {

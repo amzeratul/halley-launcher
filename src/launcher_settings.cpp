@@ -1,6 +1,6 @@
 #include "launcher_settings.h"
 
-ProjectLocation::ProjectLocation(String path, std::optional<String> url)
+ProjectLocation::ProjectLocation(Path path, std::optional<String> url)
 	: path(std::move(path))
 	, url(std::move(url))
 {
@@ -9,7 +9,7 @@ ProjectLocation::ProjectLocation(String path, std::optional<String> url)
 ProjectLocation::ProjectLocation(const ConfigNode& node)
 {
 	if (node.getType() == ConfigNodeType::String) {
-		path = node.asString();
+		path = Path(node.asString());
 	} else {
 		path = node["path"].asString("");
 		url = node["url"].asOptional<String>();
@@ -19,12 +19,12 @@ ProjectLocation::ProjectLocation(const ConfigNode& node)
 ConfigNode ProjectLocation::toConfigNode() const
 {
 	ConfigNode::MapType result;
-	result["path"] = path;
+	result["path"] = path.toString();
 	result["url"] = url;
 	return result;
 }
 
-bool ProjectLocation::operator==(const String& str) const
+bool ProjectLocation::operator==(const Path& str) const
 {
 	return path == str;
 }
@@ -69,7 +69,7 @@ gsl::span<const ProjectLocation> LauncherSettings::getProjects() const
 	return projects;
 }
 
-const ProjectLocation* LauncherSettings::tryGetProject(const String& path) const
+const ProjectLocation* LauncherSettings::tryGetProject(const Path& path) const
 {
 	for (const auto& project: projects) {
 		if (project.path == path) {
@@ -79,7 +79,7 @@ const ProjectLocation* LauncherSettings::tryGetProject(const String& path) const
 	return nullptr;
 }
 
-bool LauncherSettings::addProject(String path, std::optional<String> url)
+bool LauncherSettings::addProject(Path path, std::optional<String> url)
 {
 	if (!std_ex::contains(projects, path)) {
 		projects.insert(projects.begin(), path);
@@ -89,7 +89,7 @@ bool LauncherSettings::addProject(String path, std::optional<String> url)
 	return false;
 }
 
-bool LauncherSettings::removeProject(const String& path)
+bool LauncherSettings::removeProject(const Path& path)
 {
 	if (std_ex::contains(projects, path)) {
 		std_ex::erase(projects, path);
@@ -99,7 +99,7 @@ bool LauncherSettings::removeProject(const String& path)
 	return false;
 }
 
-void LauncherSettings::bumpProject(const String& path)
+void LauncherSettings::bumpProject(const Path& path)
 {
 	const auto iter = std_ex::find(projects, path);
 	if (iter != projects.end() && iter != projects.begin()) {
